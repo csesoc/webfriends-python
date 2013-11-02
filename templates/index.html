@@ -1,0 +1,168 @@
+{% macro map(lab,label) -%}
+	{% if label %}
+	<h4 class="label-{{ 'open' if labs[lab].state else 'closed' }}">{{ labs[lab].name }}</h4>
+	{% else %}
+		{% set insert_label=True %}
+	{% endif %}
+	{% set width,height = labs[lab].size %}
+	<div class="lab lab-{{ width }}-{{ height }} {{ 'open' if labs[lab].state else 'closed' }}" id="{{ labs[lab].name }}">
+		{% if insert_label %}
+		<div class="{{ labs[lab].name }}-label lab-label label-{{ 'open' if labs[lab].state else 'closed' }}">{{ labs[lab].name }}</div>
+		{% endif %}
+		{% for direction in labs[lab].doors %}
+			{% for doors in direction %}
+				{% for door in labs[lab].doors[doors] %}
+					{% set xref,yref = door %}
+					<div class="grid-{{ xref }}-{{ yref }} door-{{ direction }} lab-door"></div>
+				{% endfor %}
+			{% endfor %}
+		{% endfor %}
+				
+		{% for user in labs[lab].users.keys() %}
+			{% set xref, yref = labs[lab].computers[user] %}
+			
+			<div class="comp grid-{{ xref }}-{{ yref }}" id="{{ labs[lab].name }}{{user}}">
+
+
+
+
+				<div class="screenwrap screen-{{ labs[lab].directions[user] }}">
+					<div class="cssscreen {{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
+				
+					{% if labs[lab].users[user].user_id %}
+					<div class="cssperson {{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
+					{% endif %}
+				</div>
+
+			</div>
+
+		{% endfor %}
+	</div>
+
+{%- endmacro %}
+
+
+
+
+
+
+
+{% extends "layout.html" %}
+{% block content %}
+
+{% if debug %}
+<div class="row">
+	<div class="col-md-12">
+		<div class="well">
+			<h4>Debugging:</h4>
+			{% for lab in labs %}
+				<b>{{ labs[lab].name }}:</b><br />
+				{% for user in labs[lab].users %}
+					{% if labs[lab].users[user].user_id %}					
+						{{ labs[lab].name }}{{ user }} {{labs[lab].users[user].user_id}}<br />
+					{% endif %}
+				{% endfor %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+{% endif %}
+
+
+<div class="row">
+	<div class="col-md-12">
+		<div id="content" class="tab-content">
+      		<div class="tab-pane active" id="k17">
+
+      			
+  				<div>
+  					<div class="pull-left">
+  						{{ map('oud', True) }}
+  					</div>
+  					<div class="pull-left">
+  						{{ map('banjo', True) }}
+  					</div>
+  				</div>
+      			<div class="clearfix"></div>
+      			
+
+			</div>
+		    <div class="tab-pane" id="me">
+		    These labs will soon be moving, so ceebs to redo the positioning with the new method.
+		    	<div>
+		    		<div class="pull-left">
+		    			
+		    		</div>
+		    		<div class="pull-left">
+				    	
+				    </div>
+				</div>
+		    	<div class="clearfix"></div>
+		    	
+
+		    </div>
+		    <div class="tab-pane" id="ee">
+
+		    	<div>
+  					<div class="pull-left">
+  						{{ map('erhu', True) }}
+  					</div>
+  					<div class="pull-left">
+  						{{ map('sanhu', True) }}
+  					</div>
+  				</div>
+  				<div class="clearfix"></div>
+            	
+            		{{ map('guan', True) }}
+            	
+        
+		    </div>
+		    <div class="tab-pane" id="kb">
+	  			{{ map('piano', True) }}
+	  			{{ map('organ', True) }}
+	  			{{ map('clavier', True) }}
+	  		
+			</div>
+	  
+      </div>
+    </div>
+	<!-- <div class="col-md-3">
+		<div class="well">
+			<h4>Statistics</h4>
+			
+		</div>
+
+ 	</div> -->
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+	<script type="text/javascript">
+	{% for lab in labs %}
+
+		
+		{% for computer in labs[lab].users %}
+			
+			{% if labs[lab].users[computer].user_id %}
+				content = "	ID: {{ labs[lab].users[computer].user_id }}<br /> \
+							zID: {{ labs[lab].users[computer].zid }}<br /> \
+							Since: {{ labs[lab].users[computer].since }}";
+				title = "{{ labs[lab].users[computer].name }}";
+
+				$('#{{lab}}{{ computer }}').popover({container:'.tab-content',
+												placement:'bottom',
+												content:content,
+												title:title,
+												html:true,
+												trigger:'hover'});
+			{% endif %}
+
+
+
+
+		{% endfor %}
+		
+	{% endfor %}
+	</script>
+{% endblock %}
