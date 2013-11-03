@@ -136,26 +136,27 @@ def getLabs(labs):
 				state_data = re.search(r'(?<=is )[\S]+', line)
 				state_text = state_data.group().strip().rstrip(',')
 				state = False if state_text == "CLOSED" else True
+			else:
 
-			comp_data = re.search(r'.*(?=:[\bUp\b\bDown\b])', line)
+				comp_data = re.search(r'.*(?=:[\bUp\b\bDown\b])', line)
 
-			if comp_data:
-				comp_name = comp_data.group().strip()[:-2]
-				comp_no = int(comp_name[-2:])
-				user_data = re.search(r'(?<=[\bAllocated\b\bTentative\b]: )[\S]+', line)
-				if user_data:
-					user_name = user_data.group().strip()
-				else:
-					user_name = ""
+				if comp_data:
+					comp_name = comp_data.group().strip()[:-2]
+					comp_no = int(comp_name[-2:])
+					user_data = re.search(r'(?<=[\bAllocated\b\bTentative\b]: )[\S]+', line)
+					if user_data:
+						user_name = user_data.group().strip()
+					else:
+						user_name = ""
 
-				since_data = re.search(r'(?<=since ).*', line)
-				if since_data:
-					since_plus_year = since_data.group().strip()+" "+time.strftime("%Y")
-					since = time.strptime(since_plus_year,"%d/%m;%H:%M:%S %Y")
-				else:
-					since = time.strptime(time.strftime("%d/%m;0:0:0 %Y"),"%d/%m;%H:%M:%S %Y")
+					since_data = re.search(r'(?<=since ).*', line)
+					if since_data:
+						since_plus_year = since_data.group().strip()+" "+time.strftime("%Y")
+						since = time.strptime(since_plus_year,"%d/%m;%H:%M:%S %Y")
+					else:
+						since = time.strptime(time.strftime("%d/%m;0:0:0 %Y"),"%d/%m;%H:%M:%S %Y")
 
-				users[comp_no] = newComputer(user_name, since)
+					users[comp_no] = newComputer(user_name, since)
 
 		lab_output.update({lab:newLab(lab,labs[lab]['grid_pos'],labs[lab]['directions'],users,state,labs[lab]['size'],labs[lab]['doors'])})
 
@@ -183,7 +184,7 @@ def getJson(lab_data):
 	for i in lab_data:
 		json+='"'+i+'": '
 		json+=lab_data[i].to_json()
-		json+=","
+		json+=", "
 	json = json[:-1]	
 	json += "}"
 	return json

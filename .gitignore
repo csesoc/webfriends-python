@@ -7,3 +7,4 @@ err.log
 itsdangerous.pyc
 routes.pyc
 werkzeug/
+webfriends.pyc

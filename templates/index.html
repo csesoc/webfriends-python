@@ -63,8 +63,6 @@
 					{% endif %}
 				{% endfor %}
 			{% endfor %}
-			<hr>
-			{{json}}
 		</div>
 	</div>
 </div>
@@ -179,7 +177,7 @@
 	  	if (searchText!="") {
 	  		$.each(labs, function(index, value) {
 				$.each(value.users, function(index2, value2) {
-					if ((searchText==value2.user_id)||(searchText==value2.user_name)||(searchText==value2.user_zid)||(value2.user_name.indexOf(searchText) !== -1)) {
+					if ((searchText==value2.user_id)||(searchText==value2.user_name)||(searchText==value2.user_zid)||(value2.user_name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
 						
 						foundText = "<small><b>"+value2.user_name+"</b>: "+value.name+""+index2+ "</small><br />";
 						var pre = $( '#searchResults' ).html();
@@ -196,6 +194,16 @@
 	});
 	$("#content").resize(function(e){
 		$("#searchResults").css({'height':(($("#content").height()-50)+'px')});
+	});
+
+	$('#searchText').bind("enterKey",function(e){
+   		$('#searchButton').click();
+	});
+	$('#searchText').keyup(function(e){
+	    if(e.keyCode == 13)
+	    {
+	        $(this).trigger("enterKey");
+	    }
 	});
 	
 
