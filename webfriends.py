@@ -1,14 +1,9 @@
 #!/usr/bin/python2.7
-import cgitb
-cgitb.enable()
+import cgitb, subprocess, re, time, os, sys, json, smtplib
 from flask import Flask, render_template, request
-import subprocess 
-import re
-import time
-import os
 from werkzeug.contrib.cache import SimpleCache
-from dateutil import parser
-import sys
+
+cgitb.enable()
 
 cache = SimpleCache()
 
@@ -52,13 +47,28 @@ class Lab(object):
 				out+="\t"+self.users[i].name+"\n"
 		return out
 
-	
+	def to_json(self):
+		json = "{"
+		json+= '"name": "'+self.name+'", '
+		json+= '"state": "'+str(self.state)+'", '
+		json+= '"users": ['
+		for i in self.users:
+			json+= "{"
+			json+= '"user_id": "'+self.users[i].user_id+'", '
+			json+= '"user_name": "'+self.users[i].name+'", '
+			json+= '"user_zid": "'+self.users[i].zid+'", '
+			json+= '"time_since_logged": "'+self.users[i].since_string+'"'
+			json+= "},"
+		json = json[:-1]
+		json+= "]}"
+		return json
 
 class Computer(object):
 	user_id = ""
 	name = ""
 	zid = ""
-	since = ""
+	since = time.struct_time
+	since_string = ""
 	
 	def getData(self, user_id):
 		user = {}
@@ -83,6 +93,7 @@ class Computer(object):
 		self.name = self.getData(user_id)['user_name']
 		self.zid = self.getData(user_id)['user_zid']
 		self.since = since
+		self.since_string = time.strftime("%H:%M:%S %d/%m", since)
 
 	def __str__(self):
 		if self.user_id:
@@ -139,12 +150,10 @@ def getLabs(labs):
 
 				since_data = re.search(r'(?<=since ).*', line)
 				if since_data:
-					try:
-						since = parser.parse(since_data.group().strip())
-					except ValueError:
-						since = since_data.group().strip()
+					since_plus_year = since_data.group().strip()+" "+time.strftime("%Y")
+					since = time.strptime(since_plus_year,"%d/%m;%H:%M:%S %Y")
 				else:
-					since = ""
+					since = time.strptime(time.strftime("%d/%m;0:0:0 %Y"),"%d/%m;%H:%M:%S %Y")
 
 				users[comp_no] = newComputer(user_name, since)
 
@@ -168,6 +177,16 @@ def getStats(lab_data):
 			stats['high_lab_name'] = lab.name
 
 	return stats
+
+def getJson(lab_data):
+	json = "{"
+	for i in lab_data:
+		json+='"'+i+'": '
+		json+=lab_data[i].to_json()
+		json+=","
+	json = json[:-1]	
+	json += "}"
+	return json
 
 
 @app.route('/')
@@ -246,12 +265,54 @@ def home():
 				}
 
 	lab_data = getLabs(labs)
-
 	return render_template('index.html',
 		labs = lab_data,
+		json = getJson(lab_data),
 		debug = debug)
 
+@app.route('/feedback')
+def feedback():
+	output = ""
+	if request.args.get('body'):
 
+		if request.args.get('subject'):
+			subject = request.args.get('subject')
+		else:
+			subject = ""
+
+		message = request.args.get('body')
+
+		if request.args.get('email'):
+			email = request.args.get('email')
+		else:
+			email = ""
+
+
+		sender = 'jwis261@cse.unsw.edu.au'
+		receivers = ['jwis261@cse.unsw.edu.au']
+
+		message = """MIME-Version: 1.0
+Content-type: text/html
+Subject: webfriends suggestion: """+subject+"""
+
+
+Feedback from webfriends form:<br /><br />
+
+"""+message+"""<br /><br />
+
+from email: """+email
+
+		try:
+		   smtpObj = smtplib.SMTP('smtp.cse.unsw.edu.au')
+		   smtpObj.sendmail(sender, receivers, message)
+		   smtpObj.quit()         
+		   output+= "Successfully sent email"
+		except smtplib.SMTPException:
+		   output+= "Error: unable to send email. SMTPException"
+	else:
+		output+= "Please enter a message."
+	return render_template('feedback.html',
+		output = output)
 
 
 if not app.debug:

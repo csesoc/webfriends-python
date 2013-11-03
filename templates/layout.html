@@ -32,7 +32,7 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-     <a class="navbar-brand" href="/wf_py/webfriends.py.cgi/">webFriends</a>
+     <a class="navbar-brand" href="/webfriends-python/webfriends.py.cgi/">webFriends</a>
   </div>
 
   <!-- Collect the nav links, forms, and other content for toggling -->
@@ -41,7 +41,7 @@
      <ul class="nav" id="labTabs">
                     
                         <li class="active"><a href="#k17" style="-webkit-border-radius: 0;-moz-border-radius: 0;border-radius: 0;">K17</a></li>
-                        <li><a href="#me">Mech Eng</a></li>
+                        <!-- <li><a href="#me">Mech Eng</a></li> -->
                         <li><a href="#ee">Elec Eng</a></li>
                         <li><a href="#kb">Keith Burrows</a></li>
                     
@@ -60,6 +60,50 @@
       {% endblock %}
     </div>
     <!-- /.container -->
+    <a href="#" data-toggle="modal" data-target="#feedbackForm">
+      <div id="suggestionbg"></div>
+    
+    <div id="suggestionbt">
+    Suggestions
+    </div></a>
+
+  <!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="feedbackForm" tabindex="-1" role="dialog" aria-labelledby="feedbackFormLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="feedbackFormLabel">Feedback</h4>
+      </div>
+       <form role="form" method="get" action="feedback">
+      <div class="modal-body">
+
+        <div class="form-group">
+            <label for="feedbackSubject">Subject</label>
+            <input type="text" class="form-control" id="feedbackSubject" name="subject" placeholder="Enter subject">
+        </div>
+        <div class="form-group">
+            <label for="feedbackBody">Message</label>
+            <textarea class="form-control" id="feedbackBody" rows="4" name="body" placeholder="Enter message"></textarea>
+        </div>
+            <div class="form-group">
+            <label for="feedbackEmail">Email address <small>(if you think further chat might be necessary)</small></label>
+            <input type="email" class="form-control" id="feedbackEmail" name="email" placeholder="Enter email">
+          </div>
+ 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+      </div>
+       </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 
 
     <!-- Load JS here for greater good =============================-->
@@ -73,6 +117,7 @@
     <script src="{{ url_for('static', filename='js/flatui-radio.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.tagsinput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.placeholder.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.ba-resize.min.js') }}"></script>
     <script type="text/javascript" charset="utf-8">
         $("#labTabs a").click(function (e) {
           e.preventDefault()

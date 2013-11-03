@@ -7,8 +7,8 @@
 .open 			{ 	background-color:#ecf0f1;	}
 .closed 		{ 	background-color:#777777;	}
 
-.available 		{ 	background:#2ecc71;	}
-.unavailable	{ 	background:#e74c3c;			}
+.available 		{ 	background-color:#2ecc71;	}
+.unavailable	{ 	background-color:#e74c3c;			}
 
 .label-open {
 	color: #27ae60;
@@ -46,28 +46,6 @@
 .door-E {border-left: 3px solid black;}
 .door-W {border-right: 3px solid black;}
 
-
-.oud-door { height:3px; 	width:31px; 	top:0; 			right: 31px;}
-.banjo-door { height:3px; 	width:31px; 	top:0; 			right: 31px;}
-.bugle-door { height:31px; 	width:3px; 		bottom:61px; 	left: 28px;}
-.pipe-door { height:3px; 	width:31px; 	top:0; 			left: 0;}
-.moog-door { height:31px; 	width:3px; 		bottom:62px; 	left: 0px;}
-.moog-door1 { height:31px; 	width:3px; 		bottom:62px; 	right: 0px;}
-.leaf-door { height:31px; 	width:3px; 		top:62px; 		left: 0px;}
-.leaf-door1 { height:31px; 	width:3px; 		top:62px; 		right: 0px;}
-.bell-door { height:3px; 	width:31px; 	top:0;	 		right: 31px;}
-.bell-door1 { height:31px; 	width:3px; 		bottom:62px; 	left: 0px;}
-.spoons-door { height:3px; 	width:31px; 	bottom:0; 		right: 62px;}
-.spoons-door1 { height:31px;width:3px; 		top:62px; 		left: 0px;}
-.erhu-door { height:3px; 	width:31px; 	bottom:0; 		left: 0px;}
-.erhu-door1 { height:31px;	width:3px; 		bottom:31px; 	right: 0px;}
-.sanhu-door { height:31px; 	width:3px; 	 	bottom:5px; 	left:0px;}
-.sanhu-door1 { height:31px;	width:3px; 		bottom:93px; 	left: 0px;}
-.guan-door { height:3px; 	width:31px; 	bottom:0px; 	left:31px;}
-.mabu-door { height:31px; 	width:3px; 		bottom:5px; 	right:0px;}
-.piano-door { height:3px; 	width:31px; 	bottom:0px; 	left:5px;}
-.organ-door { height:31px; 	width:3px; 		bottom:31px; 	left:0px;}
-.clavier-door { height:31px; width:3px; 	bottom:31px; 	left:0px;}
 
 .screenwrap{
 	height:31px;
@@ -425,6 +403,24 @@
 
 }
 
+#suggestionbg{
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    border-bottom: 130px solid #1abc9c;
+	border-left: 130px solid transparent;
+	z-index:998;
+}
 
+#suggestionbt {
+	position: fixed;
+    right: 5px;
+    bottom: 30px;
+    	z-index:999;
+    	color:white;
+    transform:rotate(315deg);
+-ms-transform:rotate(315deg); /* IE 9 */
+-webkit-transform:rotate(315deg); /* Safari and Chrome */
+}
 
 

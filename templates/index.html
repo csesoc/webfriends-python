@@ -63,6 +63,8 @@
 					{% endif %}
 				{% endfor %}
 			{% endfor %}
+			<hr>
+			{{json}}
 		</div>
 	</div>
 </div>
@@ -70,7 +72,7 @@
 
 
 <div class="row">
-	<div class="col-md-12">
+	<div class="col-md-8">
 		<div id="content" class="tab-content">
       		<div class="tab-pane active" id="k17">
 
@@ -87,7 +89,7 @@
       			
 
 			</div>
-		    <div class="tab-pane" id="me">
+		   <!--  <div class="tab-pane" id="me">
 		    These labs will soon be moving, so ceebs to redo the positioning with the new method.
 		    	<div>
 		    		<div class="pull-left">
@@ -100,7 +102,7 @@
 		    	<div class="clearfix"></div>
 		    	
 
-		    </div>
+		    </div> -->
 		    <div class="tab-pane" id="ee">
 
 		    	<div>
@@ -126,13 +128,15 @@
 	  
       </div>
     </div>
-	<!-- <div class="col-md-3">
-		<div class="well">
-			<h4>Statistics</h4>
-			
-		</div>
-
- 	</div> -->
+	<div class="col-md-4">
+	    <div class="input-group">
+	      <input type="text" class="form-control" placeholder="Find a person..." id="searchText">
+	      <span class="input-group-btn">
+	        <button class="btn btn-default" type="button" style="height:42px" id="searchButton">Search</button>
+	      </span>
+	    </div>
+	    <div class="well" style="margin-top:10px;display:none;text-size;overflow-y:auto" id="searchResults"></div>
+ 	</div>
 </div>
 
 {% endblock %}
@@ -147,7 +151,7 @@
 			{% if labs[lab].users[computer].user_id %}
 				content = "	ID: {{ labs[lab].users[computer].user_id }}<br /> \
 							zID: {{ labs[lab].users[computer].zid }}<br /> \
-							Since: {{ labs[lab].users[computer].since }}";
+							Since: {{ labs[lab].users[computer].since_string }}";
 				title = "{{ labs[lab].users[computer].name }}";
 
 				$('#{{lab}}{{ computer }}').popover({container:'.tab-content',
@@ -164,5 +168,36 @@
 		{% endfor %}
 		
 	{% endfor %}
+
+	var json_data = '{{json}}';
+	var labs = eval ("("+json_data.replace(/\&\#34\;/g, "'")+")");
+
+	$( "#searchButton" ).click(function() {
+		var searchText = $('#searchText').val()
+		var foundText = "The user "+searchText+" could not be found";
+		$( '#searchResults' ).html("");
+	  	if (searchText!="") {
+	  		$.each(labs, function(index, value) {
+				$.each(value.users, function(index2, value2) {
+					if ((searchText==value2.user_id)||(searchText==value2.user_name)||(searchText==value2.user_zid)||(value2.user_name.indexOf(searchText) !== -1)) {
+						
+						foundText = "<small><b>"+value2.user_name+"</b>: "+value.name+""+index2+ "</small><br />";
+						var pre = $( '#searchResults' ).html();
+						$( '#searchResults' ).html( pre + foundText);
+					} 
+					$("#searchResults").css({'display':'inherit'});
+					
+				});
+			}); 
+	  	}
+	});
+	$(function() {
+		$("#searchResults").css({'height':(($("#content").height()-50)+'px')});
+	});
+	$("#content").resize(function(e){
+		$("#searchResults").css({'height':(($("#content").height()-50)+'px')});
+	});
+	
+
 	</script>
 {% endblock %}
