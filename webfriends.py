@@ -65,7 +65,7 @@ class Lab(object):
 		json+= "]}"
 		return json
 
-class Computer(object):
+class User(object):
 	user_id = ""
 	name = ""
 	zid = ""
@@ -104,9 +104,9 @@ class Computer(object):
 			out = ""
 		return out
 	
-def newComputer(user_id, since):
-	computer = Computer(user_id, since)
-	return computer
+def newUser(user_id, since):
+	user = User(user_id, since)
+	return user
 
 def newLab(name, computers, directions, users, state, size, doors, online):
 	lab = Lab(name, computers, directions, users, state, size, doors, online)
@@ -172,7 +172,7 @@ def getLabs(labs):
 						else:
 							since = time.strptime(time.strftime("%d/%m;0:0:0 %Y"),"%d/%m;%H:%M:%S %Y")
 
-						users[comp_no] = newComputer(user_name, since)
+						users[comp_no] = newUser(user_name, since)
 		else:
 			online = False
 

@@ -9,6 +9,13 @@ text-align: center;
 
 }
 
+.sup
+{
+position:relative;
+top:-10px;
+font-size:14px;
+}
+
 .lab-open 			{ 	background-color:#ecf0f1; }
 .lab-closed 		{ 	background-color:#777777; }
 
