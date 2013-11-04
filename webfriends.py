@@ -69,6 +69,7 @@ class User(object):
 	user_id = ""
 	name = ""
 	zid = ""
+	degree = ""
 	since = time.struct_time
 	since_string = ""
 	
@@ -190,6 +191,18 @@ def getLabs(labs):
 	# 	out+= server_list
 	# return out
 
+def increaseHits():
+	out = ""
+	hits = cache.get('hits')
+	if hits is None:
+		out+="hits is none"
+		hits = 1
+	else:
+		out+="hits exists"
+		hits = int(hits) + 10
+	cache.set('hits', hits, timeout=60*60*24*30*12)
+	return out
+
 def getStats(lab_data):
 	stats = {}
 	stats['high_lab_name'] = ""
@@ -267,8 +280,8 @@ def home():
 								},
 					"piano": 	{
 									"directions":	['NE','NW','NE','NW','NE','NW','NE','NW','NE','SE','SW','SE','SW','SE','SW','SE','SW','SE'],
-									"grid_pos":		[(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(11,0),(11,2),(10,2),(9,2),(8,2),(7,2),(6,2),(5,2),(4,2),(3,2)],
-									"size":			(12,3),
+									"grid_pos":		[(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(10,2),(9,2),(8,2),(7,2),(6,2),(5,2),(4,2),(3,2),(2,2)],
+									"size":			(11,3),
 									"doors":		{
 														'S':	[(0,2)]
 													}
@@ -305,6 +318,7 @@ def home():
 	return render_template('index.html',
 		labs = lab_data,
 		temps = temps,
+		hits = increaseHits(),
 		json = getJson(lab_data),
 		debug = debug)
 

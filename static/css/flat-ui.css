@@ -924,12 +924,14 @@ fieldset[disabled] .btn-link:focus {
 }
 .navbar .nav {
   margin-right: 0;
-  display: inline-block;
+  /*display: inline-block;*/
+  display: block;
   float: left;
 }
 .navbar .nav > li {
   position: relative;
-  display: inline-block;
+  /*display: inline-block;*/
+  display: block;
 }
 .navbar .nav > li:hover > ul {
   opacity: 1;
@@ -948,7 +950,7 @@ fieldset[disabled] .btn-link:focus {
   box-shadow: none;
 }
 .navbar .nav > li:first-child {
-  border-radius: 6px 6px 0 0;
+  /*border-radius: 6px 6px 0 0;*/
 }
 .navbar .nav > li:last-child {
   border-radius: 0 0 6px 6px;
@@ -960,9 +962,9 @@ fieldset[disabled] .btn-link:focus {
 }
 .navbar .nav > li > ul:before {
   content: "";
-  border-style: solid;
+  /*border-style: solid;
   border-width: 0 9px 9px 9px;
-  border-color: transparent transparent #34495e transparent;
+  border-color: transparent transparent #34495e transparent;*/
   height: 0;
   position: absolute;
   left: 15px;
@@ -1103,7 +1105,7 @@ fieldset[disabled] .btn-link:focus {
   font-size: 17px;
 }
 .navbar-inverse .navbar-brand {
-  border-bottom: 2px solid #2c3e50;
+  /*border-bottom: 2px solid #2c3e50;*/
   border-right: 2px solid #2c3e50;
   color: #ffffff;
   padding: 10px 28px 11px 32px;
@@ -1125,7 +1127,6 @@ fieldset[disabled] .btn-link:focus {
 .navbar-inverse .nav > li.active > a:hover,
 .navbar-inverse .nav > li.active > a:focus {
   background-color: #1abc9c;
-  border-bottom-color: #16a085;
   border-left: none;
   color: #ffffff;
   padding-left: 20px;
@@ -1136,8 +1137,8 @@ fieldset[disabled] .btn-link:focus {
 }
 .navbar-inverse .nav > li > a {
   font-size: 16px;
-  border-bottom: 2px solid #2c3e50;
-  border-left: 2px solid #2c3e50 !important;
+  border-bottom: 2px solid transparent;
+  /*border-left: 2px solid #2c3e50 !important;*/
   color: #ffffff;
   padding: 16px 20px 15px;
   line-height: 20px;

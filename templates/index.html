@@ -71,7 +71,7 @@
 					{% endif %}
 				{% endfor %}
 			{% endfor %}
-			{{ temps }}
+			Hits: {{ hits }}
 		</div>
 	</div>
 </div>
@@ -79,7 +79,16 @@
 
 
 <div class="row">
-	<div class="col-md-8">
+	<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 pull-right" style="padding-bottom:10px">
+	    <div class="input-group">
+	      <input type="text" class="form-control" placeholder="Find a person..." id="searchText">
+	      <span class="input-group-btn">
+	        <button class="btn btn-default" type="button" style="height:42px" id="searchButton">Search</button>
+	      </span>
+	    </div>
+	    <div class="well" style="margin-top:10px;margin-bottom:0;display:none;text-size;overflow-y:auto" id="searchResults"></div>
+ 	</div>
+	<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 pull-left">
 		<div id="content" class="tab-content">
       		<div class="tab-pane active" id="k17">
 
@@ -135,15 +144,7 @@
 	  
       </div>
     </div>
-	<div class="col-md-4">
-	    <div class="input-group">
-	      <input type="text" class="form-control" placeholder="Find a person..." id="searchText">
-	      <span class="input-group-btn">
-	        <button class="btn btn-default" type="button" style="height:42px" id="searchButton">Search</button>
-	      </span>
-	    </div>
-	    <div class="well" style="margin-top:10px;display:none;text-size;overflow-y:auto" id="searchResults"></div>
- 	</div>
+	
 </div>
 
 {% endblock %}
@@ -249,13 +250,15 @@
 					
 				});
 			}); 
+	  	} else {
+	  		$("#searchResults").css({'display':'none'});
 	  	}
 	});
 	$(function() {
-		$("#searchResults").css({'height':(($("#content").height()-50)+'px')});
+		$("#searchResults").css({'height':(($("#content").max-height()-50)+'px')});
 	});
 	$("#content").resize(function(e){
-		$("#searchResults").css({'height':(($("#content").height()-50)+'px')});
+		$("#searchResults").css({'height':(($("#content").max-height()-50)+'px')});
 	});
 
 	$('#searchText').bind("enterKey",function(e){

@@ -20,9 +20,9 @@
   
     </head>
     <body>
-        <div class="container">
+        <div class="container clearfix">
 
-            <nav class="navbar navbar-inverse" role="navigation" style="margin-top:10px">
+            <nav class="navbar navbar-inverse" role="navigation" style="margin-top:10px;margin-bottom:10px">
             
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#webfriends-nav">
@@ -34,8 +34,8 @@
                     <a class="navbar-brand" href="/webfriends-python/webfriends.py.cgi/">webFriends <span class="sup">beta</span></a>
                 </div>
                 <div class="collapse navbar-collapse" id="webfriends-nav">
-                    <ul class="nav" id="labTabs">
-                        <li class="active"><a href="#k17" style="-webkit-border-radius: 0;-moz-border-radius: 0;border-radius: 0;">K17</a></li>
+                    <ul class="nav navbar-nav" id="labTabs">
+                        <li class="active"><a href="#k17">K17</a></li>
                         <!-- <li><a href="#me">Mech Eng</a></li> -->
                         <li><a href="#ee">Elec Eng</a></li>
                         <li><a href="#kb">Keith Burrows</a></li>
@@ -45,10 +45,12 @@
 
             {% block content %}
             {% endblock %}
+
+            <p class="text-center"><a href="#" class="visible-xs" data-toggle="modal" data-target="#feedbackForm">Suggestions</a></p>
         </div>
         
         
-        <a href="#" data-toggle="modal" data-target="#feedbackForm">
+        <a href="#" class="hidden-xs" data-toggle="modal" data-target="#feedbackForm">
             <div id="suggestionbg"></div>
             <div id="suggestionbt">Suggestions</div>
         </a>
