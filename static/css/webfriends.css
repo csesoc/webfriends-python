@@ -1,5 +1,6 @@
 .lab {
-	outline: 1px solid #aaa;
+	box-shadow: 0px 0px 0px 1px #aaa;
+	margin: 1px;
 	position:relative;
 }
 

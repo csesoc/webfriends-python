@@ -9,34 +9,36 @@
 		{% if insert_label %}
 		<div class="{{ labs[lab].name }}-label lab-label label-{{ 'open' if labs[lab].state else 'closed' }}">{{ labs[lab].name }}</div>
 		{% endif %}
-		{% for direction in labs[lab].doors %}
-			{% for doors in direction %}
-				{% for door in labs[lab].doors[doors] %}
-					{% set xref,yref = door %}
-					<div class="grid-{{ xref }}-{{ yref }} door-{{ direction }} lab-door"></div>
+		{% if labs[lab].online %}
+			{% for direction in labs[lab].doors %}
+				{% for doors in direction %}
+					{% for door in labs[lab].doors[doors] %}
+						{% set xref,yref = door %}
+						<div class="grid-{{ xref }}-{{ yref }} door-{{ direction }} lab-door"></div>
+					{% endfor %}
 				{% endfor %}
 			{% endfor %}
-		{% endfor %}
+					
+			{% for user in labs[lab].users.keys() %}
+				{% set xref, yref = labs[lab].computers[user] %}
 				
-		{% for user in labs[lab].users.keys() %}
-			{% set xref, yref = labs[lab].computers[user] %}
-			
-			<div class="comp grid-{{ xref }}-{{ yref }}" id="{{ labs[lab].name }}{{user}}">
+				<div class="comp grid-{{ xref }}-{{ yref }}" id="{{ labs[lab].name }}{{user}}">
 
 
 
 
-				<div class="screenwrap screen-{{ labs[lab].directions[user] }}">
-					<div class="cssscreen {{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
-				
-					{% if labs[lab].users[user].user_id %}
-					<div class="cssperson {{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
-					{% endif %}
+					<div class="screenwrap screen-{{ labs[lab].directions[user] }}">
+						<div class="cssscreen {{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
+					
+						{% if labs[lab].users[user].user_id %}
+						<div class="cssperson {{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
+						{% endif %}
+					</div>
+
 				</div>
 
-			</div>
-
-		{% endfor %}
+			{% endfor %}
+		{% endif %}
 	</div>
 
 {%- endmacro %}
@@ -63,6 +65,7 @@
 					{% endif %}
 				{% endfor %}
 			{% endfor %}
+			{{ temps }}
 		</div>
 	</div>
 </div>
@@ -102,7 +105,7 @@
 
 		    </div> -->
 		    <div class="tab-pane" id="ee">
-
+		    <!-- Erhu and sahu are currently offline for some reason. -->
 		    	<div>
   					<div class="pull-left">
   						{{ map('erhu', True) }}

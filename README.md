@@ -4,12 +4,11 @@
 -----
 ###To-do:
 
-
+- .friends access - keep a friends list? add users etc
 - fix colours when labs are closed
 - fix popup to make it automatically move to space
 - printers
-- get users from servers (ssh <wagner|weill|williams> who)
-- .friends access - keep a friends list? add users etc
-- get access to ~status/temperature for room temperature (see therm.pl)
 - viewcounter
 - get user classes/degrees (see degreemap)
+- get users from servers (ssh <wagner|weill|williams> who)
+- get access to ~status/temperature for room temperature (see therm.pl)

@@ -15,11 +15,12 @@ class Lab(object):
 	name = ""
 	computers = []
 	directions = []
-	state = ""
+	state = False
 	users = []
 	size = tuple()
 	doors = {}
 	total_user_number = 0
+	online = True
 
 	def getUserNumber(self):
 		number = 0
@@ -28,7 +29,7 @@ class Lab(object):
 				number+=int(self.users[user].zid[1:])
 		return number
 
-	def __init__(self, name, computers, directions, users, state, size, doors):
+	def __init__(self, name, computers, directions, users, state, size, doors, online):
 		self.name = name
 		self.computers = computers
 		self.directions = directions
@@ -37,6 +38,7 @@ class Lab(object):
 		self.size = size
 		self.doors = doors
 		self.total_user_number = self.getUserNumber()
+		self.online = online
 
 	def __str__(self):
 		state = "open" if self.state else "closed"
@@ -75,7 +77,7 @@ class Computer(object):
 		if user_id != "":
 			user_data = cache.get('user-'+user_id)
 			if user_data is None:
-				user_data = importData("pp",user_id)
+				user_data = importData(["pp",user_id])
 				cache.set('user-'+user_id, user_data, timeout=60 * 60 *24 * 30 * 3)
 			user_name_data = re.search(r'(?<=[^\bUser\b] Name : ).*', user_data)
 			zid_data = re.search(r'z[0-9]+', user_data)
@@ -106,21 +108,31 @@ def newComputer(user_id, since):
 	computer = Computer(user_id, since)
 	return computer
 
-def newLab(name, computers, directions, users, state, size, doors):
-	lab = Lab(name, computers, directions, users, state, size, doors)
+def newLab(name, computers, directions, users, state, size, doors, online):
+	lab = Lab(name, computers, directions, users, state, size, doors, online)
 	return lab
 
 def importLabData(lab, refresh_time):
 	
 	lab_data = cache.get('lab-'+lab)
 	if lab_data is None:
-		lab_data = importData('/usr/local/bin/lab',lab)
-		cache.set('lab-'+lab, lab_data, timeout=refresh_time)
+		#lab_data = importData(['/usr/local/bin/lab',lab])
+
+		process = subprocess.Popen(['timeout','3s','/usr/local/bin/lab',lab], stdout=subprocess.PIPE)
+		lab_data, err = process.communicate()
+		cache.set('lab-'+lab, lab_data, timeout=refresh_time*60)
 	return lab_data
 
+def importServerData(server, refresh_time):
+	server_data = cache.get('server-'+server)
+	if server_data is None:
+		server_data = importData(['ssh',server,'who'])
+		cache.set('server-'+server, server_data, timeout=refresh_time)
+	return server_data
 
-def importData(command, arguments):
-	process = subprocess.Popen([command, arguments], stdout=subprocess.PIPE)
+
+def importData(command):
+	process = subprocess.Popen(command, stdout=subprocess.PIPE)
 	out, err = process.communicate()
 	return out
 
@@ -130,37 +142,53 @@ def getLabs(labs):
 
 		users = {}
 		lab_list = importLabData(lab,60)
-		for line in lab_list.splitlines():
 
-			if line[0:3] == 'Lab':
-				state_data = re.search(r'(?<=is )[\S]+', line)
+		if len(lab_list.splitlines()) > 2:
+			if lab_list.splitlines()[1][0:3] == 'Lab':
+				state_data = re.search(r'(?<=is )[\S]+', lab_list.splitlines()[1])
 				state_text = state_data.group().strip().rstrip(',')
 				state = False if state_text == "CLOSED" else True
-			else:
+				online = True
+				for line in lab_list.splitlines():
 
-				comp_data = re.search(r'.*(?=:[\bUp\b\bDown\b])', line)
+					
+					
 
-				if comp_data:
-					comp_name = comp_data.group().strip()[:-2]
-					comp_no = int(comp_name[-2:])
-					user_data = re.search(r'(?<=[\bAllocated\b\bTentative\b]: )[\S]+', line)
-					if user_data:
-						user_name = user_data.group().strip()
-					else:
-						user_name = ""
+					comp_data = re.search(r'.*(?=:[\bUp\b\bDown\b])', line)
 
-					since_data = re.search(r'(?<=since ).*', line)
-					if since_data:
-						since_plus_year = since_data.group().strip()+" "+time.strftime("%Y")
-						since = time.strptime(since_plus_year,"%d/%m;%H:%M:%S %Y")
-					else:
-						since = time.strptime(time.strftime("%d/%m;0:0:0 %Y"),"%d/%m;%H:%M:%S %Y")
+					if comp_data:
+						comp_name = comp_data.group().strip()[:-2]
+						comp_no = int(comp_name[-2:])
+						user_data = re.search(r'(?<=[\bAllocated\b\bTentative\b]: )[\S]+', line)
+						if user_data:
+							user_name = user_data.group().strip()
+						else:
+							user_name = ""
 
-					users[comp_no] = newComputer(user_name, since)
+						since_data = re.search(r'(?<=since ).*', line)
+						if since_data:
+							since_plus_year = since_data.group().strip()+" "+time.strftime("%Y")
+							since = time.strptime(since_plus_year,"%d/%m;%H:%M:%S %Y")
+						else:
+							since = time.strptime(time.strftime("%d/%m;0:0:0 %Y"),"%d/%m;%H:%M:%S %Y")
 
-		lab_output.update({lab:newLab(lab,labs[lab]['grid_pos'],labs[lab]['directions'],users,state,labs[lab]['size'],labs[lab]['doors'])})
+						users[comp_no] = newComputer(user_name, since)
+		else:
+			online = False
+
+		lab_output.update({lab:newLab(lab,labs[lab]['grid_pos'],labs[lab]['directions'],users,state,labs[lab]['size'],labs[lab]['doors'],online)})
 
 	return lab_output
+
+
+# Not working, im guessing because of a permissions thing on the server
+
+# def getServers(servers):
+	# out = ""
+	# for server in servers:
+	# 	server_list = importServerData(server,120)
+	# 	out+= server_list
+	# return out
 
 def getStats(lab_data):
 	stats = {}
@@ -182,9 +210,10 @@ def getStats(lab_data):
 def getJson(lab_data):
 	json = "{"
 	for i in lab_data:
-		json+='"'+i+'": '
-		json+=lab_data[i].to_json()
-		json+=", "
+		if lab_data[i].online:
+			json+='"'+i+'": '
+			json+=lab_data[i].to_json()
+			json+=", "
 	json = json[:-1]	
 	json += "}"
 	return json
@@ -265,9 +294,17 @@ def home():
 								}
 				}
 
+
+
+	# a=open('../../../../maestro/1/status/lab-spoons','rb')
+	# lines = a.readlines()
+	# temps = lines[-1]		
+	temps = importData(["sh","../gettemp.sh","spoons"])
+
 	lab_data = getLabs(labs)
 	return render_template('index.html',
 		labs = lab_data,
+		temps = temps,
 		json = getJson(lab_data),
 		debug = debug)
 
