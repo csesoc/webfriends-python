@@ -5,7 +5,7 @@
 		{% set insert_label=True %}
 	{% endif %}
 	{% set width,height = labs[lab].size %}
-	<div class="lab lab-{{ width }}-{{ height }} {{ 'open' if labs[lab].state else 'closed' }}" id="{{ labs[lab].name }}">
+	<div class="lab lab-{{ width }}-{{ height }} lab-{{ 'open' if labs[lab].state else 'closed' }}" id="{{ labs[lab].name }}">
 		{% if insert_label %}
 		<div class="{{ labs[lab].name }}-label lab-label label-{{ 'open' if labs[lab].state else 'closed' }}">{{ labs[lab].name }}</div>
 		{% endif %}
@@ -21,23 +21,29 @@
 					
 			{% for user in labs[lab].users.keys() %}
 				{% set xref, yref = labs[lab].computers[user] %}
-				
-				<div class="comp grid-{{ xref }}-{{ yref }}" id="{{ labs[lab].name }}{{user}}">
+				<div class="comp comp-{{ 'open' if labs[lab].state else 'closed' }} grid-{{ xref }}-{{ yref }} " id="{{ labs[lab].name }}{{user}}">
 
-
-
+				{% if labs[lab].users[user].user_id %}
+					{% set termstate = 'unavailable' %}
+				{% elif labs[lab].state %}
+					{% set termstate = 'available' %}
+				{% else %}
+					{% set termstate = 'closed' %}
+				{% endif %}
 
 					<div class="screenwrap screen-{{ labs[lab].directions[user] }}">
-						<div class="cssscreen {{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
+						<div class="cssscreen terminal-{{ termstate }}"></div>
 					
 						{% if labs[lab].users[user].user_id %}
-						<div class="cssperson {{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
+						<div class="cssperson terminal-{{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
 						{% endif %}
 					</div>
 
 				</div>
 
 			{% endfor %}
+		{% else %}
+			<div class="offline">Offline</div>
 		{% endif %}
 	</div>
 

@@ -5,7 +5,6 @@
 ###To-do:
 
 - .friends access - keep a friends list? add users etc
-- fix colours when labs are closed
 - fix popup to make it automatically move to space
 - printers
 - viewcounter

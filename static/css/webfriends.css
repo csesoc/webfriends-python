@@ -4,12 +4,21 @@
 	position:relative;
 }
 
+.offline{
+text-align: center;
 
-.open 			{ 	background-color:#ecf0f1;	}
-.closed 		{ 	background-color:#777777;	}
+}
 
-.available 		{ 	background-color:#1abc9c;	}
-.unavailable	{ 	background-color:#e74c3c;			}
+.lab-open 			{ 	background-color:#ecf0f1; }
+.lab-closed 		{ 	background-color:#777777; }
+
+.comp-open 		{ 	background-color:#ddd; }
+.comp-closed 	{ 	background-color:#888; }
+
+.terminal-closed { background-color:#777777; }
+
+.terminal-available 		{ 	background-color:#1abc9c;	}
+.terminal-unavailable	{ 	background-color:#e74c3c;			}
 
 .label-open {
 	color: #27ae60;
@@ -23,7 +32,6 @@
 	height:31px;
 	width:31px;
 	position:absolute;
-	background-color:#ddd;
 }
 
 .print {
