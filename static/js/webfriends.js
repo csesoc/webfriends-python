@@ -47,26 +47,12 @@ function autoPlacement(tip, element) {
 }
 
 
-// Sorts out persistent tabs
+// make tabs work
 
 $("#labTabs a").click(function (e) {
-    e.preventDefault()
-    $(this).tab("show")
-})
-
-$("ul#labTabs > li > a").on("shown.bs.tab", function (e) {
-    var id = $(e.target).attr("href").substr(1);
-    window.location.hash = id;
+    $(this).tab("show");
+    e.preventDefault();
 });
-
-var hash = window.location.hash;
-$('#labTabs a[href="' + hash + '"]').tab('show');
-if (hash) {
-    window.scrollTo(0, 0);
-    setTimeout(function() {
-            window.scrollTo(0, 0);     // run it a bit later also for browser compatibility
-        }, 1);
-}
 
 
 // Deals with searching
@@ -91,8 +77,19 @@ $( "#searchButton" ).click(function() {
 });
 
 // Deals with resizing the search box so it doesnt look strange
-
+// Also deals with persisten tabs (kinda)
 $(function() {
+
+    var hash = window.location.hash;
+    hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+    window.scrollTo(0, 0);
+    $('#labTabs a').click(function (e) {
+        $(this).tab('show');
+        var scrollmem = $('body').scrollTop();
+        window.location.hash = this.hash;
+        $('html,body').scrollTop(scrollmem);
+    });
+
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
 });
 $("#content").resize(function(e){
