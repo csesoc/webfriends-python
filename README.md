@@ -1,6 +1,6 @@
 #webfriends-python
 ------------
-Track your friends in UNSE cse labs over the web
+Track your friends in UNSW cse labs over the web
 
 
 ##Instructions:
