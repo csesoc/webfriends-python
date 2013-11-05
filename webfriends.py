@@ -1,15 +1,15 @@
 #!/usr/bin/python2.7
-import cgitb, subprocess, re, time, os, sys, json, smtplib
+import subprocess, re, time, os, sys, json, smtplib
 from flask import Flask, render_template, request
 from werkzeug.contrib.cache import SimpleCache
+#cgitb.enable()
 
-cgitb.enable()
-
-cache = SimpleCache()
 
 app = Flask(__name__)      
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', debug=False)
+	app.run(debug=False)
+	
+cache = SimpleCache()
 
 class Lab(object):
 	name = ""
@@ -81,20 +81,30 @@ class User(object):
 				user_data = importData(["pp",user_id])
 				cache.set('user-'+user_id, user_data, timeout=60 * 60 *24 * 30 * 3)
 			user_name_data = re.search(r'(?<=[^\bUser\b] Name : ).*', user_data)
+			user_name = user_name_data.group().strip()
+
 			zid_data = re.search(r'z[0-9]+', user_data)
 			user_zid = zid_data.group().strip()
-			user_name = user_name_data.group().strip()
+			
+			degree_data = re.search(r' [\d]{4}_Student', user_data)
+			if degree_data:
+				degree = getDegree(degree_data.group().strip()[:-8])
+			else:
+				degree = ""
 		else:
 			user_zid = ""
 			user_name = ""
+			degree = ""
 		user['user_zid'] = user_zid
 		user['user_name'] = user_name
+		user['degree'] = degree
 		return user
 
 	def __init__(self, user_id, since):
 		self.user_id = user_id
 		self.name = self.getData(user_id)['user_name']
 		self.zid = self.getData(user_id)['user_zid']
+		self.degree = self.getData(user_id)['degree']
 		self.since = since
 		self.since_string = time.strftime("%H:%M:%S %d/%m", since)
 
@@ -112,6 +122,54 @@ def newUser(user_id, since):
 def newLab(name, computers, directions, users, state, size, doors, online):
 	lab = Lab(name, computers, directions, users, state, size, doors, online)
 	return lab
+
+
+def getDegree(degree_num):
+	degree_name = ""
+	degree_num = int(degree_num)
+	if degree_num == 3529:
+		degree_name = "Comm/CompSci"
+	elif degree_num == 3645:
+		degree_name = "CompEng"
+	elif degree_num == 3647:
+		degree_name = "Binf"
+	elif degree_num == 3648:
+		degree_name = "Seng"
+	elif degree_num == 3651:
+		degree_name = "Seng/Sci"
+	elif degree_num == 3652:
+		degree_name = "Seng/Arts"
+	elif degree_num == 3653:
+		degree_name = "Seng/Comm"
+	elif degree_num == 3715:
+		degree_name = "Eng/Comm"
+	elif degree_num == 3722:
+		degree_name = "CompEng/Arts"
+	elif degree_num == 3726:
+		degree_name = "CompEng/Sci"
+	elif degree_num == 3728:
+		degree_name = "CompEng/Biomed"
+	elif degree_num == 3749:
+		degree_name = "Seng/Biomed"
+	elif degree_num == 3755:
+		degree_name = "Binf/Sci"
+	elif degree_num == 3756:
+		degree_name = "Binf/Arts"
+	elif degree_num == 3757:
+		degree_name = "Binf/Biomed"
+	elif degree_num == 3978:
+		degree_name = "CompSci"
+	elif degree_num == 3968:
+		degree_name = "CompSci/Arts"
+	elif degree_num == 3982:
+		degree_name = "CompSco/BDM"
+	elif degree_num == 3983:
+		degree_name = "CompSci/Sci"
+	elif degree_num == 1650:
+		degree_name = "CompSci (PG)"   
+	else:
+		degree_name = "Eng/Sci"
+	return degree_name
 
 def importLabData(lab, refresh_time):
 	
@@ -152,9 +210,6 @@ def getLabs(labs):
 				online = True
 				for line in lab_list.splitlines():
 
-					
-					
-
 					comp_data = re.search(r'.*(?=:[\bUp\b\bDown\b])', line)
 
 					if comp_data:
@@ -180,28 +235,6 @@ def getLabs(labs):
 		lab_output.update({lab:newLab(lab,labs[lab]['grid_pos'],labs[lab]['directions'],users,state,labs[lab]['size'],labs[lab]['doors'],online)})
 
 	return lab_output
-
-
-# Not working, im guessing because of a permissions thing on the server
-
-# def getServers(servers):
-	# out = ""
-	# for server in servers:
-	# 	server_list = importServerData(server,120)
-	# 	out+= server_list
-	# return out
-
-def increaseHits():
-	out = ""
-	hits = cache.get('hits')
-	if hits is None:
-		out+="hits is none"
-		hits = 1
-	else:
-		out+="hits exists"
-		hits = int(hits) + 10
-	cache.set('hits', hits, timeout=60*60*24*30*12)
-	return out
 
 def getStats(lab_data):
 	stats = {}
@@ -271,7 +304,7 @@ def home():
 													}
 								},
 					"sanhu": 	{
-									"directions":	[],
+									"directions":	['NW','SW','NW','NE','SE','NE','SE','NE','NW','SW','NW','SW','NW','NE','SE','NE','SE','NE','NW','SW','NW','SW','NW','NE','SE','NE','SE','NE','SE'],
 									"grid_pos":		[(0,2),(0,1),(0,0),(2,0),(2,1),(2,2),(2,3),(2,4),(3,4),(3,3),(3,2),(3,1),(3,0),(5,0),(5,1),(5,2),(5,3),(5,4),(6,4),(6,3),(6,2),(6,1),(6,0),(8,0),(8,1),(8,2),(8,3),(8,4),(8,5)],
 									"size":			(9,7),
 									"doors":		{
@@ -280,8 +313,8 @@ def home():
 								},
 					"piano": 	{
 									"directions":	['NE','NW','NE','NW','NE','NW','NE','NW','NE','SE','SW','SE','SW','SE','SW','SE','SW','SE'],
-									"grid_pos":		[(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(10,2),(9,2),(8,2),(7,2),(6,2),(5,2),(4,2),(3,2),(2,2)],
-									"size":			(11,3),
+									"grid_pos":		[(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(9,2),(8,2),(7,2),(6,2),(5,2),(4,2),(3,2),(2,2),(1,2)],
+									"size":			(10,3),
 									"doors":		{
 														'S':	[(0,2)]
 													}
@@ -309,16 +342,10 @@ def home():
 
 
 
-	# a=open('../../../../maestro/1/status/lab-spoons','rb')
-	# lines = a.readlines()
-	# temps = lines[-1]		
-	temps = importData(["sh","../gettemp.sh","spoons"])
-
+	
 	lab_data = getLabs(labs)
 	return render_template('index.html',
 		labs = lab_data,
-		temps = temps,
-		hits = increaseHits(),
 		json = getJson(lab_data),
 		debug = debug)
 

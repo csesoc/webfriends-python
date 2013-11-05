@@ -8,3 +8,4 @@ itsdangerous.pyc
 routes.pyc
 werkzeug/
 webfriends.pyc
+cache/

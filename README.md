@@ -7,6 +7,5 @@
 - .friends access - keep a friends list? add users etc
 - printers
 - viewcounter
-- get user classes/degrees (see degreemap)
 - get users from servers (ssh <wagner|weill|williams> who)
 - get access to ~status/temperature for room temperature (see therm.pl)

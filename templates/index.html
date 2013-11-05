@@ -71,7 +71,6 @@
 					{% endif %}
 				{% endfor %}
 			{% endfor %}
-			Hits: {{ hits }}
 		</div>
 	</div>
 </div>
@@ -159,7 +158,10 @@
 			{% if labs[lab].users[computer].user_id %}
 				content = "	ID: {{ labs[lab].users[computer].user_id }}<br /> \
 							zID: {{ labs[lab].users[computer].zid }}<br /> \
-							Since: {{ labs[lab].users[computer].since_string }}";
+							Since: {{ labs[lab].users[computer].since_string }}<br /> \
+							{% if labs[lab].users[computer].degree %} \
+							Degree: {{ labs[lab].users[computer].degree }} \
+							{% endif %}";
 				title = "{{ labs[lab].users[computer].name }}";
 
 				$('#{{lab}}{{ computer }}').popover({container:'.tab-content',
@@ -249,16 +251,23 @@
 					$("#searchResults").css({'display':'inherit'});
 					
 				});
-			}); 
+			});
+			if ($("#searchResults").text()=="") {
+				$("#searchResults").html("<small>No results found.</small>")
+			}
 	  	} else {
 	  		$("#searchResults").css({'display':'none'});
 	  	}
 	});
 	$(function() {
-		$("#searchResults").css({'height':(($("#content").max-height()-50)+'px')});
+		$("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
+    	// if (location.hash !== '') $('a[href="' + location.hash + '"]').tab('show');
+	    // return $('a[data-toggle="tab"]').on('shown', function(e) {
+	    // 	return location.hash = $(e.target).attr('href').substr(1);
+	    // });
 	});
 	$("#content").resize(function(e){
-		$("#searchResults").css({'height':(($("#content").max-height()-50)+'px')});
+		$("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
 	});
 
 	$('#searchText').bind("enterKey",function(e){
