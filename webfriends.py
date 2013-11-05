@@ -246,50 +246,6 @@ def home():
 		labs = lab_data,
 		debug = debug)
 
-@app.route('/feedback')
-def feedback():
-	output = ""
-	if request.args.get('body'):
-
-		if request.args.get('subject'):
-			subject = request.args.get('subject')
-		else:
-			subject = ""
-
-		message = request.args.get('body')
-
-		if request.args.get('email'):
-			email = request.args.get('email')
-		else:
-			email = ""
-
-
-		sender = 'jwis261@cse.unsw.edu.au'
-		receivers = ['jwis261@cse.unsw.edu.au']
-
-		message = """MIME-Version: 1.0
-Content-type: text/html
-Subject: webfriends suggestion: """+subject+"""
-
-
-Feedback from webfriends form:<br /><br />
-
-"""+message+"""<br /><br />
-
-from email: """+email
-
-		try:
-		   smtpObj = smtplib.SMTP('smtp.cse.unsw.edu.au')
-		   smtpObj.sendmail(sender, receivers, message)
-		   smtpObj.quit()         
-		   output+= "Successfully sent email"
-		except smtplib.SMTPException:
-		   output+= "Error: unable to send email. SMTPException"
-	else:
-		output+= "Please enter a message."
-	return render_template('feedback.html',
-		output = output)
-
 
 if not app.debug:
     import logging
