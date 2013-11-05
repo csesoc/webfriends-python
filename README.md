@@ -12,3 +12,5 @@ Don't forget the /, or you will get a 500.
 
 ###Todo:
  - See issues
+
+Webfriends is available under the Apache License 2.0.
