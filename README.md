@@ -1,9 +1,17 @@
 #webfriends-python
 ------------
-##Track your friends in UNSE cse labs over the web.
------
-###To-do:
+Track your friends in UNSE cse labs over the web
 
+
+##Instructions:
+1. Stick the repo in your public_html directory on your cse account.
+2. Open wenfriends.py.cgi/ with a web browser
+
+Don't forget the /, or you will get a 500.
+
+##To-do:
+
+- more on screen instructions
 - typeahead
 - .friends access - keep a friends list? add users etc
 - printers
