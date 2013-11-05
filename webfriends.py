@@ -2,10 +2,10 @@
 import subprocess, re, time, os, sys, json, smtplib
 from flask import Flask, render_template, request
 from werkzeug.contrib.cache import SimpleCache
-#cgitb.enable()
-
 
 app = Flask(__name__)      
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
 if __name__ == '__main__':
 	app.run(debug=False)
 	
@@ -13,21 +13,13 @@ cache = SimpleCache()
 
 class Lab(object):
 	name = ""
-	computers = []
+	computers = [] #stores the grid coords
 	directions = []
 	state = False
 	users = []
 	size = tuple()
 	doors = {}
-	total_user_number = 0
 	online = True
-
-	def getUserNumber(self):
-		number = 0
-		for user in self.users:
-			if self.users[user].zid:
-				number+=int(self.users[user].zid[1:])
-		return number
 
 	def __init__(self, name, computers, directions, users, state, size, doors, online):
 		self.name = name
@@ -37,7 +29,6 @@ class Lab(object):
 		self.users = users
 		self.size = size
 		self.doors = doors
-		self.total_user_number = self.getUserNumber()
 		self.online = online
 
 	def __str__(self):
@@ -123,7 +114,6 @@ def newLab(name, computers, directions, users, state, size, doors, online):
 	lab = Lab(name, computers, directions, users, state, size, doors, online)
 	return lab
 
-
 def getDegree(degree_num):
 	degree_name = ""
 	degree_num = int(degree_num)
@@ -162,7 +152,7 @@ def getDegree(degree_num):
 	elif degree_num == 3968:
 		degree_name = "CompSci/Arts"
 	elif degree_num == 3982:
-		degree_name = "CompSco/BDM"
+		degree_name = "CompSci/BDM"
 	elif degree_num == 3983:
 		degree_name = "CompSci/Sci"
 	elif degree_num == 1650:
@@ -175,20 +165,13 @@ def importLabData(lab, refresh_time):
 	
 	lab_data = cache.get('lab-'+lab)
 	if lab_data is None:
-		#lab_data = importData(['/usr/local/bin/lab',lab])
 
+		# timeout prevents offline labs from hanging the site
 		process = subprocess.Popen(['timeout','3s','/usr/local/bin/lab',lab], stdout=subprocess.PIPE)
+
 		lab_data, err = process.communicate()
 		cache.set('lab-'+lab, lab_data, timeout=refresh_time*60)
 	return lab_data
-
-def importServerData(server, refresh_time):
-	server_data = cache.get('server-'+server)
-	if server_data is None:
-		server_data = importData(['ssh',server,'who'])
-		cache.set('server-'+server, server_data, timeout=refresh_time)
-	return server_data
-
 
 def importData(command):
 	process = subprocess.Popen(command, stdout=subprocess.PIPE)
@@ -208,6 +191,7 @@ def getLabs(labs):
 				state_text = state_data.group().strip().rstrip(',')
 				state = False if state_text == "CLOSED" else True
 				online = True
+
 				for line in lab_list.splitlines():
 
 					comp_data = re.search(r'.*(?=:[\bUp\b\bDown\b])', line)
@@ -235,23 +219,6 @@ def getLabs(labs):
 		lab_output.update({lab:newLab(lab,labs[lab]['grid_pos'],labs[lab]['directions'],users,state,labs[lab]['size'],labs[lab]['doors'],online)})
 
 	return lab_output
-
-def getStats(lab_data):
-	stats = {}
-	stats['high_lab_name'] = ""
-	stats['high_lab_num'] = 0
-	stats['low_lab_name'] = ""
-	stats['low_lab_num'] = sys.maxint
-
-	for lab in labs:
-		if lab.total_user_number < stats['low_lab_num']:
-			stats['low_lab_num'] = lab.total_user_number
-			stats['low_lab_name']  = lab.name
-		if lab.total_user_number > stats['high_lab_num']:
-			stats['high_lab_num'] = lab.total_user_number
-			stats['high_lab_name'] = lab.name
-
-	return stats
 
 def getJson(lab_data):
 	json = "{"

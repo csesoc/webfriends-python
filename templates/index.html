@@ -18,11 +18,9 @@
 					{% endfor %}
 				{% endfor %}
 			{% endfor %}
-					
 			{% for user in labs[lab].users.keys() %}
 				{% set xref, yref = labs[lab].computers[user] %}
-				<div class="comp comp-{{ 'open' if labs[lab].state else 'closed' }} grid-{{ xref }}-{{ yref }} " id="{{ labs[lab].name }}{{user}}" data-userid="{{ labs[lab].users[user].user_id }}" data-username="{{ labs[lab].users[user].name }}" data-userzid="{{ labs[lab].users[user].zid }}" data-since="{{ labs[lab].users[user].since_string }}" data-degree="{{ labs[lab].users[user].degree }}">
-
+				<div class="comp comp-{{ 'open' if labs[lab].state else 'closed' }} grid-{{ xref }}-{{ yref }} " id="{{ labs[lab].name }}{{user}}" data-user-id="{{ labs[lab].users[user].user_id }}" data-user-name="{{ labs[lab].users[user].name }}" data-user-zid="{{ labs[lab].users[user].zid }}" data-user-since="{{ labs[lab].users[user].since_string }}" data-user-degree="{{ labs[lab].users[user].degree }}">
 				{% if labs[lab].users[user].user_id %}
 					{% set termstate = 'unavailable' %}
 				{% elif labs[lab].state %}
@@ -30,7 +28,6 @@
 				{% else %}
 					{% set termstate = 'closed' %}
 				{% endif %}
-
 					<div class="screenwrap screen-{{ labs[lab].directions[user] }}">
 						<div class="cssscreen terminal-{{ termstate }}"></div>
 					
@@ -38,112 +35,99 @@
 						<div class="cssperson terminal-{{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
 						{% endif %}
 					</div>
-
 				</div>
-
 			{% endfor %}
 		{% else %}
 			<div class="offline">Offline</div>
 		{% endif %}
 	</div>
-
 {%- endmacro %}
-
-
-
-
-
-
-
 {% extends "layout.html" %}
 {% block content %}
-
-{% if debug %}
-<div class="row">
-	<div class="col-md-12">
-		<div class="well">
-			<h4>Debugging:</h4>
-			{% for lab in labs %}
-				<b>{{ labs[lab].name }}:</b><br />
-				{% for user in labs[lab].users %}
-					{% if labs[lab].users[user].user_id %}					
-						{{ labs[lab].name }}{{ user }} {{labs[lab].users[user].user_id}}<br />
-					{% endif %}
-				{% endfor %}
-			{% endfor %}
-		</div>
-	</div>
-</div>
-{% endif %}
-
-
-<div class="row">
-	<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 pull-right" style="padding-bottom:10px">
-	    <div class="input-group">
-	      <input type="text" class="form-control" placeholder="Find a person..." id="searchText">
-	      <span class="input-group-btn">
-	        <button class="btn btn-default" type="button" style="height:42px" id="searchButton">Search</button>
-	      </span>
-	    </div>
-	    <div class="well" style="margin-top:10px;margin-bottom:0;display:none;text-size;overflow-y:auto" id="searchResults"></div>
- 	</div>
-	<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 pull-left">
-		<div id="content" class="tab-content">
-      		<div class="tab-pane active" id="k17">
-
-      			
-  				<div>
-  					<div class="pull-left">
-  						{{ map('oud', True) }}
-  					</div>
-  					<div class="pull-left">
-  						{{ map('banjo', True) }}
-  					</div>
-  				</div>
-      			<div class="clearfix"></div>
-      			
-
-			</div>
-		   <!--  <div class="tab-pane" id="me">
-		    These labs will soon be moving, so ceebs to redo the positioning with the new method.
-		    	<div>
-		    		<div class="pull-left">
-		    			
-		    		</div>
-		    		<div class="pull-left">
-				    	
-				    </div>
+	{% if debug %}
+		<div class="row">
+			<div class="col-md-12">
+				<div class="well">
+					<h4>Debugging:</h4>
+					{% for lab in labs %}
+						<b>{{ labs[lab].name }}:</b><br />
+						{% for user in labs[lab].users %}
+							{% if labs[lab].users[user].user_id %}					
+								{{ labs[lab].name }}{{ user }} {{labs[lab].users[user].user_id}}<br />
+							{% endif %}
+						{% endfor %}
+					{% endfor %}
 				</div>
-		    	<div class="clearfix"></div>
-		    	
-
-		    </div> -->
-		    <div class="tab-pane" id="ee">
-		    <!-- Erhu and sahu are currently offline for some reason. -->
-		    	<div>
-  					<div class="pull-left">
-  						{{ map('erhu', True) }}
-  					</div>
-  					<div class="pull-left">
-  						{{ map('sanhu', True) }}
-  					</div>
-  				</div>
-  				<div class="clearfix"></div>
-            	
-            		{{ map('guan', True) }}
-            	
-        
-		    </div>
-		    <div class="tab-pane" id="kb">
-	  			{{ map('piano', True) }}
-	  			{{ map('organ', True) }}
-	  			{{ map('clavier', True) }}
-	  		
 			</div>
-	  
-      </div>
-    </div>
-	
-</div>
+		</div>
+	{% endif %}
+		<div class="row">
+			<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 pull-right" style="padding-bottom:10px">
+			    <div class="input-group">
+			      <input type="text" class="form-control" placeholder="Find a person..." id="searchText">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="button" style="height:42px" id="searchButton">Search</button>
+			      </span>
+			    </div>
+			    <div class="well" style="margin-top:10px;margin-bottom:0;display:none;text-size;overflow-y:auto" id="searchResults"></div>
+		 	</div>
+			<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 pull-left">
+				<div id="content" class="tab-content">
+		      		<div class="tab-pane active" id="k17">
+
+		      			
+		  				<div>
+		  					<div class="pull-left">
+		  						{{ map('oud', True) }}
+		  					</div>
+		  					<div class="pull-left">
+		  						{{ map('banjo', True) }}
+		  					</div>
+		  				</div>
+		      			<div class="clearfix"></div>
+		      			
+
+					</div>
+				   <!--  <div class="tab-pane" id="me">
+				    These labs will soon be moving, so ceebs to redo the positioning with the new method.
+				    	<div>
+				    		<div class="pull-left">
+				    			
+				    		</div>
+				    		<div class="pull-left">
+						    	
+						    </div>
+						</div>
+				    	<div class="clearfix"></div>
+				    	
+
+				    </div> -->
+				    <div class="tab-pane" id="ee">
+				    <!-- Erhu and sahu are currently offline for some reason. -->
+				    	<div>
+		  					<div class="pull-left">
+		  						{{ map('erhu', True) }}
+		  					</div>
+		  					<div class="pull-left">
+		  						{{ map('sanhu', True) }}
+		  					</div>
+		  				</div>
+		  				<div class="clearfix"></div>
+		            	
+		            		{{ map('guan', True) }}
+		            	
+		        
+				    </div>
+				    <div class="tab-pane" id="kb">
+			  			{{ map('piano', True) }}
+			  			{{ map('organ', True) }}
+			  			{{ map('clavier', True) }}
+			  		
+					</div>
+			  
+		      </div>
+		    </div>
+		
+	</div>
 
 {% endblock %}

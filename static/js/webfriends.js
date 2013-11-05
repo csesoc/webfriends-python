@@ -10,7 +10,7 @@ function autoPlacement(tip, element) {
         height: element.offsetHeight
     });
     actualWidth = 283;
-    actualHeight = 117;
+    actualHeight = 180;
     boundTop = $(document).scrollTop();
     boundLeft = $(document).scrollLeft();
     boundRight = boundLeft + $(window).width();
@@ -61,21 +61,24 @@ $("ul#labTabs > li > a").on("shown.bs.tab", function (e) {
 
 var hash = window.location.hash;
 $('#labTabs a[href="' + hash + '"]').tab('show');
+if (hash) {
+    window.scrollTo(0, 0);
+    setTimeout(function() {
+            window.scrollTo(0, 0);     // run it a bit later also for browser compatibility
+        }, 1);
+}
 
 
 // Deals with searching
 
 $( "#searchButton" ).click(function() {
     var searchText = $('#searchText').val()
-    var foundText = "The user "+searchText+" could not be found";
     $( '#searchResults' ).html("");
-
-     if (searchText!="") {
+    if (searchText!="") {
         $(".comp-open").each(function() {
-            if ((searchText==$(this ).data("userid"))||(searchText==$(this ).data("userzid"))||($(this ).data("username").toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
-                var foundText = "<small><b>"+$(this ).data("username")+"</b>: "+$(this ).attr('id')+ "</small><br />";
-                var pre = $( '#searchResults' ).html();
-                $( '#searchResults' ).html( pre + foundText);
+            if ((searchText==$(this ).data("user-id"))||(searchText==$(this ).data("user-zid"))||($(this ).data("user-name").toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
+                var foundText = "<small><strong>"+$(this ).data("user-name")+"</strong>: "+$(this ).attr('id')+ "</small><br />";
+                $( '#searchResults' ).append($(foundText));
             } 
             $("#searchResults").css({'display':'inherit'});
         });
@@ -108,15 +111,15 @@ $('#searchText').keyup(function(e){
 // Puts a popup over all the boxes (that require popups)
 
 $( ".comp-open" ).each(function() {
-    if ($(this).data("userid")) {
-        var content = " ID: "+$(this).data("userid")+"<br /> \
-                    zID: "+$(this).data("userzid")+"<br /> \
-                    Since: "+$(this).data("since")+"<br />";
-        if ($(this).data( "degree" )) {
-            content = content+ "Degree: "+$(this).data("degree");
+    if ($(this).data("user-id")) {
+        var content = " ID: "+$(this).data("user-id")+"<br /> \
+                    zID: "+$(this).data("user-zid")+"<br /> \
+                    Since: "+$(this).data("user-since")+"<br />";
+        if ($(this).data("user-degree")) {
+            content = content+ "Degree: "+$(this).data("user-degree");
         }
     
-        title =  $(this).data("username");
+        title =  $(this).data("user-name");
 
         $(this).popover({   container:'.tab-content',
                             placement: autoPlacement,

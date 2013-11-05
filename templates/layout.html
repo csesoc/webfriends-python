@@ -21,9 +21,7 @@
     </head>
     <body>
         <div class="container clearfix">
-
             <nav class="navbar navbar-inverse" role="navigation" style="margin-top:10px;margin-bottom:10px">
-            
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#webfriends-nav">
                         <span class="sr-only">Toggle navigation</span>
@@ -42,11 +40,13 @@
                     </ul>
                 </div>
             </nav>
-
             {% block content %}
             {% endblock %}
 
             <p class="text-center"><a href="#" class="visible-xs" data-toggle="modal" data-target="#feedbackForm">Suggestions</a></p>
+            <div class="footer">
+                <p class="text-center"><small>webFriends by <a href="mailto:jwis261@cse.unsw.edu.au">John Wiseheart</a></small></p>
+            </div>
         </div>
 
         <a href="#" class="hidden-xs" data-toggle="modal" data-target="#feedbackForm">
@@ -61,7 +61,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="feedbackFormLabel">Feedback</h4>
               </div>
-               <form role="form" method="get" action="feedback">
+               <form role="form" method="get" action="{{ request.url_root }}feedback">
               <div class="modal-body">
 
                 <div class="form-group">
