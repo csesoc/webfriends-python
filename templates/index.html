@@ -20,7 +20,39 @@
 			{% endfor %}
 			{% for user in labs[lab].users.keys() %}
 				{% set xref, yref = labs[lab].computers[user] %}
-				<div class="comp comp-{{ 'open' if labs[lab].state else 'closed' }} grid-{{ xref }}-{{ yref }} " id="{{ labs[lab].name }}{{user}}" data-user-id="{{ labs[lab].users[user].user_id }}" data-user-name="{{ labs[lab].users[user].name }}" data-user-zid="{{ labs[lab].users[user].zid }}" data-user-since="{{ labs[lab].users[user].since_string }}" data-user-degree="{{ labs[lab].users[user].degree }}">
+
+				{% if labs[lab].users[user].user_id %}
+					{% set userid = 'data-user-id='+labs[lab].users[user].user_id %}
+					
+					{% if labs[lab].users[user].since_string %}
+						{% set since = 'data-user-since="'+labs[lab].users[user].since_string+'"' %}
+					{% else %}
+						{% set since = '' %}
+					{% endif %}
+
+				{% else %}
+					{% set userid = '' %}
+				{% endif %}
+
+				{% if labs[lab].users[user].name %}
+					{% set name = 'data-user-name="'+labs[lab].users[user].name+'"' %}
+				{% else %}
+					{% set name = '' %}
+				{% endif %}
+
+				{% if labs[lab].users[user].zid %}
+					{% set userzid = 'data-user-zid='+labs[lab].users[user].zid %}
+				{% else %}
+					{% set userzid = '' %}
+				{% endif %}
+
+				{% if labs[lab].users[user].degree %}
+					{% set degree = 'data-user-degree='+labs[lab].users[user].degree %}
+				{% else %}
+					{% set degree = '' %}
+				{% endif %}
+
+				<div class="comp comp-{{ 'open' if labs[lab].state else 'closed' }} grid-{{ xref }}-{{ yref }}" id="{{ labs[lab].name }}{{user}}" {{ userid }} {{ name | safe }} {{ userzid }} {{ since | safe }} {{ degree }}>
 				{% if labs[lab].users[user].user_id %}
 					{% set termstate = 'unavailable' %}
 				{% elif labs[lab].state %}
@@ -63,7 +95,7 @@
 	{% endif %}
 		<div class="row">
 			<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 pull-right" style="padding-bottom:10px">
-			    <div class="input-group">
+			    <div class="input-group" id="searchGroup">
 			      <input type="text" class="form-control" placeholder="Find a person..." id="searchText">
 			      <span class="input-group-btn">
 			        <button class="btn btn-default" type="button" style="height:42px" id="searchButton">Search</button>
@@ -115,6 +147,7 @@
 		  				<div class="clearfix"></div>
 		            	
 		            		{{ map('guan', True) }}
+		            		{{ map('mabu', True) }}
 		            	
 		        
 				    </div>

@@ -92,8 +92,11 @@ class User(object):
 			user_name = user_name_data.group().strip()
 
 			zid_data = re.search(r'z[0-9]+', user_data)
-			user_zid = zid_data.group().strip()
-			
+			if zid_data:
+				user_zid = zid_data.group().strip()
+			else: 
+				user_zid = ""
+
 			degree_data = re.search(r' [\d]{4}_Student', user_data)
 			if degree_data:
 				degree = getDegree(degree_data.group().strip()[:-8])
@@ -173,7 +176,7 @@ def getDegree(degree_num):
 	elif degree_num == 3983:
 		degree_name = "CompSci/Sci"
 	elif degree_num == 1650:
-		degree_name = "CompSci (PG)"   
+		degree_name = "CompSci(PG)"   
 	else:
 		degree_name = "Eng/Sci"
 	return degree_name

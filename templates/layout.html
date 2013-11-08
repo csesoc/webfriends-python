@@ -43,17 +43,35 @@
             {% block content %}
             {% endblock %}
 
-            <p class="text-center"><a href="https://github.com/johnwiseheart/webfriends-python/issues/new" class="visible-xs">Suggestions</a></p>
+            <p class="text-center"><a  href=""  data-toggle="modal" data-target="#feedbackModal" class="visible-xs">Suggestions</a></p>
             <div class="footer">
                 <p class="text-center"><small>webFriends by <a href="mailto:jwis261@cse.unsw.edu.au">John Wiseheart</a> - <a href="https://github.com/johnwiseheart/webfriends-python">Source</a></small></p>
             </div>
         </div>
 
-        <a href="https://github.com/johnwiseheart/webfriends-python/issues/new" class="hidden-xs">
+        
+
+        <a href="" data-toggle="modal" data-target="#feedbackModal" class="hidden-xs">
             <div id="suggestionbg"></div>
             <div id="suggestionbt">Suggestions</div>
         </a>
         
+        <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModal" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="feedbackModal">Suggestions</h4>
+              </div>
+              <div class="modal-body">
+                I handle my suggestions through GitHub issues. To submit a bug or suggestion, you must first be registered with github, logged in, and then click <a href="https://github.com/johnwiseheart/webfriends-python/issues/new">here</a>. Alternatively you can browse to the issues section of the <a href="https://github.com/johnwiseheart/webfriends-python">GitHub repo</a>.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
 
 
 

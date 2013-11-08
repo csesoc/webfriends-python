@@ -456,4 +456,4 @@ font-size:14px;
 -webkit-transform:rotate(315deg); /* Safari and Chrome */
 }
 
-
+.popover, .popover h3.title, .popover .content { font-size: 14px; }

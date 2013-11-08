@@ -16,52 +16,79 @@
 
 
 // for automatic popover placement
-function autoPlacement(tip, element) {
-    var $element, above, actualHeight, actualWidth, below, boundBottom, boundLeft, boundRight, boundTop, elementAbove, elementBelow, elementLeft, elementRight, isWithinBounds, left, pos, right;
-    isWithinBounds = function(elementPosition) {
-        return boundTop < elementPosition.top && boundLeft < elementPosition.left && boundRight > (elementPosition.left + actualWidth) && boundBottom > (elementPosition.top + actualHeight);
-    };
-    $element = $(element);
-    pos = $.extend({}, $element.offset(), {
-        width: element.offsetWidth,
-        height: element.offsetHeight
-    });
-    actualWidth = 283;
-    actualHeight = 180;
-    boundTop = $(document).scrollTop();
-    boundLeft = $(document).scrollLeft();
-    boundRight = boundLeft + $(window).width();
-    boundBottom = boundTop + $(window).height();
-    elementAbove = {
-        top: pos.top - actualHeight,
-        left: pos.left + pos.width / 2 - actualWidth / 2
-    };
-    elementBelow = {
-        top: pos.top + pos.height,
-        left: pos.left + pos.width / 2 - actualWidth / 2
-    };
-    elementLeft = {
-         top: pos.top + pos.height / 2 - actualHeight / 2,
-         left: pos.left - actualWidth
-    };
-    elementRight = {
-        top: pos.top + pos.height / 2 - actualHeight / 2,
-        left: pos.left + pos.width
-    };
-    above = isWithinBounds(elementAbove);
-    below = isWithinBounds(elementBelow);
-    left = isWithinBounds(elementLeft);
-    right = isWithinBounds(elementRight);
-    if (above) {
-        return "top";
-    } else if (below) {
-        return "bottom";
-    } else if (left) {
-        return "left";
-    } else {
-        return "right";
+var getPlacementFunction = function (defaultPosition, width, height) {
+    return function (tip, element) {
+        var position, top, bottom, left, right;
+
+        var $element = $(element);
+        var boundTop = $(document).scrollTop();
+        var boundLeft = $(document).scrollLeft();
+        var boundRight = boundLeft + $(window).width();
+        var boundBottom = boundTop + $(window).height();
+
+        var pos = $.extend({}, $element.offset(), {
+            width: element.offsetWidth,
+            height: element.offsetHeight
+        });
+
+        var isWithinBounds = function (elPos) {
+            return boundTop < elPos.top && boundLeft < elPos.left && boundRight > (elPos.left + width) && boundBottom > (elPos.top + height);
+        };
+
+        var testTop = function () {
+            if (top === false) return false;
+            top = isWithinBounds({
+                top: pos.top - height,
+                left: pos.left + pos.width / 2 - width / 2
+            });
+            return top ? "top" : false;
+        };
+
+        var testBottom = function () {
+            if (bottom === false) return false;
+            bottom = isWithinBounds({
+                top: pos.top + pos.height,
+                left: pos.left + pos.width / 2 - width / 2
+            });
+            return bottom ? "bottom" : false;
+        };
+
+        var testLeft = function () {
+            if (left === false) return false;
+            left = isWithinBounds({
+                top: pos.top + pos.height / 2 - height / 2,
+                left: pos.left - width
+            });
+            return left ? "left" : false;
+        };
+
+        var testRight = function () {
+            if (right === false) return false;
+            right = isWithinBounds({
+                top: pos.top + pos.height / 2 - height / 2,
+                left: pos.left + pos.width
+            });
+            return right ? "right" : false;
+        };
+
+        switch (defaultPosition) {
+            case "top":
+                if (position = testTop()) return position;
+            case "bottom":
+                if (position = testBottom()) return position;
+            case "left":
+                if (position = testLeft()) return position;
+            case "right":
+                if (position = testRight()) return position;
+            default:
+                if (position = testTop()) return position;
+                if (position = testBottom()) return position;
+                if (position = testLeft()) return position;
+                if (position = testRight()) return position;
+                return defaultPosition;
+        }
     }
-}
+};
 
 
 // make tabs work
@@ -78,12 +105,16 @@ $( "#searchButton" ).click(function() {
     var searchText = $('#searchText').val()
     $( '#searchResults' ).html("");
     if (searchText!="") {
-        $(".comp-open").each(function() {
-            if ((searchText==$(this ).data("user-id"))||(searchText==$(this ).data("user-zid"))||($(this ).data("user-name").toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
-                var foundText = "<small><strong>"+$(this ).data("user-name")+"</strong>: "+$(this ).attr('id')+ "</small><br />";
-                $( '#searchResults' ).append($(foundText));
-            } 
-            $("#searchResults").css({'display':'inherit'});
+        $(".comp").each(function() {
+            if ($(this).data("user-id")) {
+                if ((searchText==$(this).data("user-id"))||(searchText==$(this).data("user-zid"))||($(this).data("user-name").toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
+                    var foundText = "<small><strong>"+$(this).data("user-name")+"</strong>: "+$(this).attr('id')+ "</small><br />";
+                    $( '#searchResults' ).append($(foundText));
+                        $(this).find('div').find('div').toggle("highlight");
+                        $(this).find('div').find('div').toggle("highlight");
+                }
+                $("#searchResults").css({'display':'inherit'});
+            }
         });
         if ($("#searchResults").text()=="") {
             $("#searchResults").html("<small>No results found.</small>")
@@ -117,29 +148,42 @@ $("#content").resize(function(e){
 // Deals with enter press in search box
 
 $('#searchText').keyup(function(e){
-    if(e.keyCode == 13) {
         $('#searchButton').click();
-    }
 });
 
 // Puts a popup over all the boxes (that require popups)
 
-$( ".comp-open" ).each(function() {
+$( ".comp" ).each(function() {
     if ($(this).data("user-id")) {
-        var content = " ID: "+$(this).data("user-id")+"<br /> \
-                    zID: "+$(this).data("user-zid")+"<br /> \
-                    Since: "+$(this).data("user-since")+"<br />";
+        var content = " ID: "+$(this).data("user-id")+"<br />";
+        if ($(this).data("user-zid")) {
+            content = content + "zID: "+$(this).data("user-zid")+"<br />";
+        }
+        if ($(this).data("user-since")) {
+            content = content + "Since: "+$(this).data("user-since")+"<br />";
+        }
         if ($(this).data("user-degree")) {
-            content = content+ "Degree: "+$(this).data("user-degree");
+            content = content + "Degree: "+$(this).data("user-degree");
         }
     
         title =  $(this).data("user-name");
 
         $(this).popover({   container:'.tab-content',
-                            placement: autoPlacement,
+                            placement:  getPlacementFunction("top", 300, 300),
                             content:content,
                             title:title,
                             html:true,
                             trigger:'hover'});
     }
+
+    content = "You can search for people based on their name, cse username and even zid."
+
+$('#searchGroup').popover({   container:'body',
+                            placement: 'bottom',
+                            content:content,
+                            delay:1000,
+                            title:"Search Tips",
+                            html:true,
+                            trigger:'hover'});
+
 });
