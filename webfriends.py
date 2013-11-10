@@ -235,6 +235,7 @@ def getLabs(labs):
 						users[comp_no] = newUser(user_name, since)
 		else:
 			online = False
+			state = False
 
 		lab_output.update({lab:newLab(lab,labs[lab]['grid_pos'],labs[lab]['directions'],users,state,labs[lab]['size'],labs[lab]['doors'],online)})
 
