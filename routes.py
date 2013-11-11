@@ -34,7 +34,7 @@ def home():
 	labs = json.load(json_data)
 	json_data.close()
 
-	lab_data = webfriends.getLabs(labs)
+	lab_data = webfriends.get_labs(labs)
 	return render_template('index.html',
 		labs = lab_data,
 		debug = debug)

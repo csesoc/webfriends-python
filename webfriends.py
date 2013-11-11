@@ -52,10 +52,20 @@ class User(object):
     since = time.struct_time
     since_string = ''
 
+    def __init__(self, user_id, since):
+
+        self.user_id = user_id
+        self.name = self.getData(user_id)['user_name']
+        self.zid = self.getData(user_id)['user_zid']
+        self.degree = self.getData(user_id)['degree']
+        self.since = since
+        self.since_string = time.strftime('%H:%M:%S %d/%m', since)
+
     def getData(self, user_id):
+
         user = {}
         if user_id != '':
-            data = importFromFile(user_id, 'users', 60 * 60 * 24 * 30 * 3)
+            data = import_from_file(user_id, 'users', 60 * 60 * 24 * 30 * 3)
 
             user_name_reg = re.search(r'(?<=[^\bUser\b] Name : ).*', data)
             user['user_name'] = user_name_reg.group().strip()
@@ -66,7 +76,7 @@ class User(object):
             degree_reg = re.search(r' [\d]{4}_Student', data)
             if degree_reg:
                 degree_num = int(degree_reg.group().strip()[:-8])
-                user['degree'] = self.getDegree(degree_num)
+                user['degree'] = self.get_degree(degree_num)
             else:
                 user['degree'] = ''
         else:
@@ -75,7 +85,7 @@ class User(object):
             user['degree'] = ''
         return user
 
-    def getDegree(self, degree_num):
+    def get_degree(self, degree_num):
 
         degrees = {
             3529: 'Comm/CompSci',
@@ -112,28 +122,20 @@ class User(object):
 
         return degree_name
 
-    def __init__(self, user_id, since):
-        self.user_id = user_id
-        self.name = self.getData(user_id)['user_name']
-        self.zid = self.getData(user_id)['user_zid']
-        self.degree = self.getData(user_id)['degree']
-        self.since = since
-        self.since_string = time.strftime('%H:%M:%S %d/%m', since)
 
-
-def newUser(user_id, since):
+def new_user(user_id, since):
 
     user = User(user_id, since)
     return user
 
 
-def newLab(name, computers, directions, users, state, size, doors, online):
+def new_lab(name, computers, directions, users, state, size, doors, online):
 
     lab = Lab(name, computers, directions, users, state, size, doors, online)
     return lab
 
 
-def importFromFile(cache_id, cache_type, refresh_time):  # cache to file # yolo
+def import_from_file(cache_id, cache_type, refresh_time=60):  # cache to file # yolo
 
     if not os.path.exists('cache'):
         os.makedirs('cache')
@@ -143,7 +145,6 @@ def importFromFile(cache_id, cache_type, refresh_time):  # cache to file # yolo
         os.makedirs('cache/labs')
 
     fileName = 'cache/' + cache_type + '/' + cache_id
-    command = []
 
     if cache_type == 'labs':
         command = ['timeout', '3s', '/usr/local/bin/lab', cache_id]
@@ -159,78 +160,87 @@ def importFromFile(cache_id, cache_type, refresh_time):  # cache to file # yolo
             useFile = True
 
     if not useFile:
-        data = importData(command)
+        data = import_data(command)
         with open(fileName, 'w') as fileData:
             fileData.write(data)
 
     return data
 
 
-def importData(command):
+def import_data(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
     out, err = process.communicate()
     return out
 
 
-def getState(line):
+def get_state(line):
     state_reg = re.search(r'(?<=is )[\S]+', line)
     state_text = state_reg.group().strip().rstrip(',')
     state = False if state_text == 'CLOSED' else True
     return state
 
 
-def getComp(line):
+def get_since(line):
+    since_reg = re.search(r'(?<=since ).*', line)
+    if since_reg:
+        since = since_reg.group().strip()
+        since_plus_year = since + ' ' + time.strftime('%Y')
+        since_out = time.strptime(since_plus_year, '%d/%m;%H:%M:%S %Y')
+    else:
+        since_out = time.strptime(time.strftime('%d/%m;0:0:0 %Y'), '%d/%m;%H:%M:%S %Y')
+
+    return since_out
+
+
+def get_username(line):
+    user_reg = re.search(r'(?<=[\bAllocated\b\bTentative\b]: )[\S]+', line)
+    user_name = user_reg.group().strip() if user_reg else ''
+
+    return user_name
+
+
+def get_computer(line):
     data = {}
-
     comp_reg = re.search(r'.*(?=:[\bUp\b\bDown\b])', line)
-
     if comp_reg:
         data['comp_name'] = comp_reg.group().strip()[:-2]
         data['comp_num'] = int(data['comp_name'][-2:])
-        user_reg = re.search(r'(?<=[\bAllocated\b\bTentative\b]: )[\S]+', line)
-        data['user_name'] = user_reg.group().strip() if user_reg else ''
-
-        since_reg = re.search(r'(?<=since ).*', line)
-        if since_reg:
-            since = since_reg.group().strip()
-            since_plus_year = since + ' ' + time.strftime('%Y')
-            data['since'] = time.strptime(since_plus_year, '%d/%m;%H:%M:%S %Y')
-        else:
-            data['since'] = time.strptime(time.strftime('%d/%m;0:0:0 %Y'), '%d/%m;%H:%M:%S %Y')
-
-        data['user'] = newUser(data['user_name'], data['since'])
+        data['user_name'] = get_username(line)
+        data['since'] = get_since(line)
+        data['user'] = new_user(data['user_name'], data['since'])
 
     return data
 
 
-def isValidLab(lab_list):
+def is_valid_lab(lab_list):
     if len(lab_list.splitlines()) > 2:
         if lab_list.splitlines()[1][0:3] == 'Lab':
             return True
+
     return False
 
 
-def getLabs(labs):
+def get_labs(labs):
     lab_output = {}
     for lab in labs.keys():
 
         users = {}
-        lab_list = importFromFile(lab, 'labs', 60)
+        lab_list = import_from_file(lab, 'labs')
 
-        if isValidLab(lab_list):
-            state = getState(lab_list.splitlines()[1])
+        if is_valid_lab(lab_list):
+            state = get_state(lab_list.splitlines()[1])
             online = True
 
             for line in lab_list.splitlines():
 
-                data = getComp(line)
+                data = get_computer(line)
                 if 'user' in data:
                     users[data['comp_num']] = data['user']
         else:
             online = False
             state = False
 
-        lab_output.update({lab: newLab(lab, labs[lab]['grid_pos'], labs[lab]['directions'],
-                                       users, state, labs[lab]['size'],  labs[lab]['doors'],  online)})
+        lab_output.update({lab: new_lab(lab, labs[lab]['grid_pos'], labs[lab]['directions'],
+                                        users, state, labs[lab]['size'],  labs[lab]['doors'],  online)})
 
     return lab_output
