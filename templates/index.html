@@ -47,12 +47,12 @@
 				{% endif %}
 
 				{% if labs[lab].users[user].degree %}
-					{% set degree = 'data-user-degree='+labs[lab].users[user].degree %}
+					{% set degree = 'data-user-degree="'+labs[lab].users[user].degree+'"' %}
 				{% else %}
 					{% set degree = '' %}
 				{% endif %}
 
-				<div class="comp comp-{{ 'open' if labs[lab].state else 'closed' }} grid-{{ xref }}-{{ yref }}" id="{{ labs[lab].name }}{{user}}" {{ userid }} {{ name | safe }} {{ userzid }} {{ since | safe }} {{ degree }}>
+				<div class="comp comp-{{ 'open' if labs[lab].state else 'closed' }} grid-{{ xref }}-{{ yref }}" id="{{ labs[lab].name }}{{user}}" {{ userid }} {{ name | safe }} {{ userzid }} {{ since | safe }} {{ degree | safe }}>
 				{% if labs[lab].users[user].user_id %}
 					{% set termstate = 'unavailable' %}
 				{% elif labs[lab].state %}

@@ -19,6 +19,6 @@
 import cgitb
 cgitb.enable()
 from wsgiref.handlers import CGIHandler
-from webfriends import app
+from routes import app
 
 CGIHandler().run(app)

@@ -1,29 +1,4 @@
-#!/usr/bin/python2.7
-
-'''
-   Copyright 2013 John Wiseheart
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-'''
-
 import subprocess, re, time, os, sys, json
-from flask import Flask, render_template, request
-
-app = Flask(__name__)      
-app.jinja_env.trim_blocks = True
-app.jinja_env.lstrip_blocks = True
-if __name__ == '__main__':
-	app.run(debug=False)
 
 class Lab(object):
 	name = ""
@@ -102,7 +77,10 @@ class User(object):
 			3968 : 	"CompSci/Arts",
 			3982 : 	"CompSci/BDM",
 			3983 : 	"CompSci/Sci",
-		 	1650 : 	"CompSci(PG)"  
+		 	1650 : 	"CompSci Rsch",
+		 	8543 :  "IT",
+		 	3969 :  "CompSci/Media",
+		 	3725 :  "Elec/Sci"
 		}
 
 		if not degree_num:
@@ -110,7 +88,7 @@ class User(object):
 		elif degree_num in degrees:
 			degree_name = degrees[degree_num]
 		else:
-			degree_name = "Eng/Sci"
+			degree_name = "Eng/Sci ["+str(degree_num)+"]"
 
 		return degree_name
 
@@ -192,10 +170,7 @@ def getLabs(labs):
 						comp_name = comp_data.group().strip()[:-2]
 						comp_no = int(comp_name[-2:])
 						user_data = re.search(r'(?<=[\bAllocated\b\bTentative\b]: )[\S]+', line)
-						if user_data:
-							user_name = user_data.group().strip()
-						else:
-							user_name = ""
+						user_name = user_data.group().strip() if user_data else ""
 
 						since_data = re.search(r'(?<=since ).*', line)
 						if since_data:
@@ -209,39 +184,14 @@ def getLabs(labs):
 			online = False
 			state = False
 
-		lab_output.update({lab:newLab(lab,labs[lab]['grid_pos'],labs[lab]['directions'],users,state,labs[lab]['size'],labs[lab]['doors'],online)})
+		lab_output.update({lab:newLab(	lab,
+										labs[lab]['grid_pos'],
+										labs[lab]['directions'],
+										users,
+										state,
+										labs[lab]['size'],
+										labs[lab]['doors'],
+										online
+									)})
 
 	return lab_output
-
-@app.route('/')
-def home():
-	debug = request.args.get('debug')
-
-	json_data = open('webfriends.json')
-	labs = json.load(json_data)
-	json_data.close()
-
-	lab_data = getLabs(labs)
-	return render_template('index.html',
-		labs = lab_data,
-		debug = debug)
-
-@app.errorhandler(500)
-def page_not_found(e):
-    return render_template('500.html',
-    	env = e)
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html',
-    	env = e),404
-
-if not app.debug:
-    import logging
-    from logging.handlers import RotatingFileHandler
-    file_handler = RotatingFileHandler('err.log', 'a', 1 * 256 * 1024, 10)
-    file_handler.setFormatter(logging.Formatter('[%(lineno)d] %(asctime)s %(levelname)s: %(message)s',"%Y-%m-%d %H:%M:%S"))
-    app.logger.setLevel(logging.INFO)
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
- 
