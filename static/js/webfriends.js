@@ -178,12 +178,12 @@ $( ".comp" ).each(function() {
 
     content = "You can search for people based on their name, cse username and even zid."
 
-$('#searchGroup').popover({   container:'body',
-                            placement: 'bottom',
-                            content:content,
-                            delay:1000,
-                            title:"Search Tips",
-                            html:true,
-                            trigger:'hover'});
+// $('#searchGroup').popover({   container:'body',
+//                             placement: 'top',
+//                             content:content,
+//                             delay:5000,
+//                             title:"Search Tips",
+//                             html:true,
+//                             trigger:'hover'});
 
 });

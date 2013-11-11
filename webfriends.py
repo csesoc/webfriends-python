@@ -7,7 +7,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,17 +16,14 @@
    limitations under the License.
 '''
 
-import subprocess, re, time, os, sys, json, smtplib
+import subprocess, re, time, os, sys, json
 from flask import Flask, render_template, request
-from werkzeug.contrib.cache import SimpleCache
 
 app = Flask(__name__)      
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 if __name__ == '__main__':
 	app.run(debug=False)
-	
-cache = SimpleCache()
 
 class Lab(object):
 	name = ""
@@ -48,31 +45,6 @@ class Lab(object):
 		self.doors = doors
 		self.online = online
 
-	def __str__(self):
-		state = "open" if self.state else "closed"
-		out = "Lab " + self.name + " is " + state + ".\n"
-		out+= "It contains: \n"
-		for i in self.users:
-			if self.users[i].user_id != "":
-				out+="\t"+self.users[i].name+"\n"
-		return out
-
-	def to_json(self):
-		json = "{"
-		json+= '"name": "'+self.name+'", '
-		json+= '"state": "'+str(self.state)+'", '
-		json+= '"users": ['
-		for i in self.users:
-			json+= "{"
-			json+= '"user_id": "'+self.users[i].user_id+'", '
-			json+= '"user_name": "'+self.users[i].name+'", '
-			json+= '"user_zid": "'+self.users[i].zid+'", '
-			json+= '"time_since_logged": "'+self.users[i].since_string+'"'
-			json+= "},"
-		json = json[:-1]
-		json+= "]}"
-		return json
-
 class User(object):
 	user_id = ""
 	name = ""
@@ -84,10 +56,8 @@ class User(object):
 	def getData(self, user_id):
 		user = {}
 		if user_id != "":
-			user_data = cache.get('user-'+user_id)
-			if user_data is None:
-				user_data = importData(["pp",user_id])
-				cache.set('user-'+user_id, user_data, timeout=60 * 60 *24 * 30 * 3)
+			user_data = importFromFile(user_id,"users", 60*60*24*30*3)
+
 			user_name_data = re.search(r'(?<=[^\bUser\b] Name : ).*', user_data)
 			user_name = user_name_data.group().strip()
 
@@ -99,7 +69,7 @@ class User(object):
 
 			degree_data = re.search(r' [\d]{4}_Student', user_data)
 			if degree_data:
-				degree = getDegree(degree_data.group().strip()[:-8])
+				degree = self.getDegree(int(degree_data.group().strip()[:-8]))
 			else:
 				degree = ""
 		else:
@@ -111,6 +81,39 @@ class User(object):
 		user['degree'] = degree
 		return user
 
+	def getDegree(self,degree_num):
+		degrees = {
+			3529 : 	"Comm/CompSci",
+			3645 : 	"CompEng",
+			3647 : 	"Binf",
+			3648 : 	"Seng",
+			3651 : 	"Seng/Sci",
+			3652 : 	"Seng/Arts",
+			3653 : 	"Seng/Comm",
+			3715 : 	"Eng/Comm",
+			3722 : 	"CompEng/Arts",
+			3726 : 	"CompEng/Sci",
+			3728 : 	"CompEng/Biomed",
+			3749 : 	"Seng/Biomed",
+			3755 : 	"Binf/Sci",
+			3756 : 	"Binf/Arts",
+			3757 : 	"Binf/Biomed",
+			3978 : 	"CompSci",
+			3968 : 	"CompSci/Arts",
+			3982 : 	"CompSci/BDM",
+			3983 : 	"CompSci/Sci",
+		 	1650 : 	"CompSci(PG)"  
+		}
+
+		if not degree_num:
+			degree_name = ""
+		elif degree_num in degrees:
+			degree_name = degrees[degree_num]
+		else:
+			degree_name = "Eng/Sci"
+
+		return degree_name
+
 	def __init__(self, user_id, since):
 		self.user_id = user_id
 		self.name = self.getData(user_id)['user_name']
@@ -118,13 +121,6 @@ class User(object):
 		self.degree = self.getData(user_id)['degree']
 		self.since = since
 		self.since_string = time.strftime("%H:%M:%S %d/%m", since)
-
-	def __str__(self):
-		if self.user_id:
-			out = "user_id: "+self.user_id+" name: "+self.name
-		else:
-			out = ""
-		return out
 	
 def newUser(user_id, since):
 	user = User(user_id, since)
@@ -134,64 +130,40 @@ def newLab(name, computers, directions, users, state, size, doors, online):
 	lab = Lab(name, computers, directions, users, state, size, doors, online)
 	return lab
 
-def getDegree(degree_num):
-	degree_name = ""
-	degree_num = int(degree_num)
-	if degree_num == 3529:
-		degree_name = "Comm/CompSci"
-	elif degree_num == 3645:
-		degree_name = "CompEng"
-	elif degree_num == 3647:
-		degree_name = "Binf"
-	elif degree_num == 3648:
-		degree_name = "Seng"
-	elif degree_num == 3651:
-		degree_name = "Seng/Sci"
-	elif degree_num == 3652:
-		degree_name = "Seng/Arts"
-	elif degree_num == 3653:
-		degree_name = "Seng/Comm"
-	elif degree_num == 3715:
-		degree_name = "Eng/Comm"
-	elif degree_num == 3722:
-		degree_name = "CompEng/Arts"
-	elif degree_num == 3726:
-		degree_name = "CompEng/Sci"
-	elif degree_num == 3728:
-		degree_name = "CompEng/Biomed"
-	elif degree_num == 3749:
-		degree_name = "Seng/Biomed"
-	elif degree_num == 3755:
-		degree_name = "Binf/Sci"
-	elif degree_num == 3756:
-		degree_name = "Binf/Arts"
-	elif degree_num == 3757:
-		degree_name = "Binf/Biomed"
-	elif degree_num == 3978:
-		degree_name = "CompSci"
-	elif degree_num == 3968:
-		degree_name = "CompSci/Arts"
-	elif degree_num == 3982:
-		degree_name = "CompSci/BDM"
-	elif degree_num == 3983:
-		degree_name = "CompSci/Sci"
-	elif degree_num == 1650:
-		degree_name = "CompSci(PG)"   
+def importFromFile(cache_id,cache_type, refresh_time): #cache to file #yolo
+
+	if not os.path.exists('cache'):
+		os.makedirs('cache')
+	if not os.path.exists('cache/users'):
+		os.makedirs('cache/users')
+	if not os.path.exists('cache/labs'):
+		os.makedirs('cache/labs')
+
+	fileName = "cache/"+cache_type+"/"+cache_id
+	command = []
+
+	if cache_type == 'labs':
+		command = ['timeout','3s','/usr/local/bin/lab',cache_id]
+	elif cache_type == 'users':
+		command = ["pp",cache_id]
+
+	if os.path.isfile(fileName):
+		if time.time() - os.path.getmtime(fileName) < refresh_time:
+			fileData = open(fileName)
+			data = fileData.read()
+			fileData.close()
+		else:
+			data = importData(command)
+			fileData = open(fileName, "w")
+			fileData.write(data)
+			fileData.close()
 	else:
-		degree_name = "Eng/Sci"
-	return degree_name
+		data = importData(command)
+		fileData = open(fileName, "a")
+		fileData.write(data)
+		fileData.close()
 
-def importLabData(lab, refresh_time):
-	
-	lab_data = cache.get('lab-'+lab)
-	if lab_data is None:
-
-		# timeout prevents offline labs from hanging the site
-		process = subprocess.Popen(['timeout','3s','/usr/local/bin/lab',lab], stdout=subprocess.PIPE)
-
-		lab_data, err = process.communicate()
-		cache.set('lab-'+lab, lab_data, timeout=refresh_time*60)
-	return lab_data
+	return data
 
 def importData(command):
 	process = subprocess.Popen(command, stdout=subprocess.PIPE)
@@ -203,7 +175,7 @@ def getLabs(labs):
 	for lab in labs.keys():
 
 		users = {}
-		lab_list = importLabData(lab,60)
+		lab_list = importFromFile(lab,"labs", 60)
 
 		if len(lab_list.splitlines()) > 2:
 			if lab_list.splitlines()[1][0:3] == 'Lab':
@@ -241,22 +213,9 @@ def getLabs(labs):
 
 	return lab_output
 
-def getJson(lab_data):
-	json = "{"
-	for i in lab_data:
-		if lab_data[i].online:
-			json+='"'+i+'": '
-			json+=lab_data[i].to_json()
-			json+=", "
-	json = json[:-1]	
-	json += "}"
-	return json
-
-
 @app.route('/')
 def home():
 	debug = request.args.get('debug')
-	out = ""
 
 	json_data = open('webfriends.json')
 	labs = json.load(json_data)
@@ -267,14 +226,22 @@ def home():
 		labs = lab_data,
 		debug = debug)
 
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('500.html',
+    	env = e)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html',
+    	env = e),404
 
 if not app.debug:
     import logging
     from logging.handlers import RotatingFileHandler
-    file_handler = RotatingFileHandler('err.log', 'a', 1 * 1024 * 1024, 10)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+    file_handler = RotatingFileHandler('err.log', 'a', 1 * 256 * 1024, 10)
+    file_handler.setFormatter(logging.Formatter('[%(lineno)d] %(asctime)s %(levelname)s: %(message)s',"%Y-%m-%d %H:%M:%S"))
     app.logger.setLevel(logging.INFO)
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
-    app.logger.info('webfriends startup')
  
