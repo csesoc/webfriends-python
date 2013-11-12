@@ -47,10 +47,12 @@ class Lab(object):
         self.temperature = self._get_temperature(name)
 
     def _get_temperature(self,name):
-        with open('cache/temp/' + name) as temp_data:
-            temp_reg = re.search(r' [0-9.]+', temp_data.read())
-            temp = float(temp_reg.group().strip()) if temp_reg else 0.0
-        return round(temp, 1)
+        path = 'cache/temp/' + name
+        if os.path.isfile(path):
+            with open(path) as temp_data:
+                temp_reg = re.search(r' [0-9.]+', temp_data.read())
+                temp = float(temp_reg.group().strip()) if temp_reg else 0.0
+            return round(temp, 1)
 
 
 class User(object):
