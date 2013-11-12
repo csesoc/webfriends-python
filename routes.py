@@ -33,9 +33,12 @@ def home():
     with open('webfriends.json') as json_data:
         labs = json.load(json_data)
 
+    server_data = webfriends.get_servers(["wagner","weill","williams"])
+
     lab_data = webfriends.get_labs(labs)
     return render_template('index.html',
         labs = lab_data,
+        servers = server_data,
         debug = debug)
 
 @app.errorhandler(500)

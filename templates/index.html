@@ -95,10 +95,14 @@
 						{% endfor %}
 						temp: {{labs[lab].temperature}}<br />
 					{% endfor %}
-					{{ debug1 }}
+					
 				</div>
 			</div>
 		</div>
+
+
+
+
 	{% endif %}
 		<div class="row">
 			<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 pull-right" style="padding-bottom:10px">
@@ -127,22 +131,7 @@
 		      			
 
 					</div>
-				   <!--  <div class="tab-pane" id="me">
-				    These labs will soon be moving, so ceebs to redo the positioning with the new method.
-				    	<div>
-				    		<div class="pull-left">
-				    			
-				    		</div>
-				    		<div class="pull-left">
-						    	
-						    </div>
-						</div>
-				    	<div class="clearfix"></div>
-				    	
-
-				    </div> -->
 				    <div class="tab-pane" id="ee">
-				    <!-- Erhu and sahu are currently offline for some reason. -->
 				    	<div>
 		  					<div class="pull-left">
 		  						{{ map('erhu', True) }}
@@ -169,5 +158,29 @@
 		    </div>
 		
 	</div>
+
+	<!-- Modal -->
+<div class="modal fade" id="userlistModal" tabindex="-1" role="dialog" aria-labelledby="userlistModalLabel" aria-hidden="true">
+ 	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        		<h4 class="modal-title" id="userlistModalLabel">User List</h4>
+      		</div>
+      		<div class="modal-body">
+        		<select id="server-select">
+        			{% for server in servers %}
+                    <option value="{{ server }}" data-users="{{ servers[server] }}">{{ server }}</option>
+                    {% endfor %}
+				</select>
+				<div class="well" id="users-list" style="max-height:400px;overflow:auto">
+				</div>
+      		</div>
+      		<div class="modal-footer">
+        		<button type="button" class="btn" data-dismiss="modal">Close</button>
+      		</div>
+    	</div><!-- /.modal-content -->
+  	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 {% endblock %}

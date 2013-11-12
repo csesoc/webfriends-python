@@ -231,10 +231,17 @@ def is_valid_lab(lab_list):
 
     return False
 
+def get_servers(servers):
+    server_output = {}
+    for server in servers:
+        with open('cache/server/' + server) as server_data:
+            server_output.update({server: server_data.read()})
+
+    return server_output
 
 def get_labs(labs):
     lab_output = {}
-    for lab in labs.keys():
+    for lab in labs:
 
         users = {}
         lab_list = import_from_file(lab, 'labs')

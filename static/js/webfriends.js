@@ -139,6 +139,9 @@ $(function() {
     });
 
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
+
+    var userlist = $('#server-select').find(":selected").data("users").split("\n").join("<br />");
+    $("#users-list").html("<pre style='font-size:10px'>" + userlist + "</pre>");
 });
 $("#content").resize(function(e){
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
@@ -176,7 +179,7 @@ $( ".comp" ).each(function() {
                             trigger:'hover'});
     }
 
-    content = "You can search for people based on their name, cse username and even zid."
+//    content = "You can search for people based on their name, cse username and even zid.";
 
 // $('#searchGroup').popover({   container:'body',
 //                             placement: 'top',
@@ -187,3 +190,12 @@ $( ".comp" ).each(function() {
 //                             trigger:'hover'});
 
 });
+
+
+$("select").selectpicker({style: 'btn-lg btn-primary', menuStyle: 'dropdown-inverse'});
+$( "#server-select" ).change(function() {
+    var userlist = $('#server-select').find(":selected").data("users").split("\n").join("<br />");
+    $("#users-list").html("<pre style='font-size:9px'>" + userlist + "</pre>");
+});
+
+

@@ -1348,6 +1348,7 @@ fieldset[disabled] .btn-link:focus {
 .select {
   display: inline-block;
   margin-bottom: 10px;
+  width:100%;
 }
 [class*="span"] > .select[class*="span"] {
   margin-left: 0;
@@ -1377,7 +1378,7 @@ fieldset[disabled] .btn-link:focus {
   width: 100%;
 }
 .select .btn {
-  width: 220px;
+  width: 100%;
 }
 .select .btn.btn-hg .filter-option {
   left: 20px;
