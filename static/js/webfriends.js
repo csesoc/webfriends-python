@@ -116,7 +116,7 @@ $( "#searchButton" ).click(function() {
                         var user_id = lab_data[lab].users[user].user_id;
                         var zid = lab_data[lab].users[user].zid;
                         var name = lab_data[lab].users[user].name;
-                        if ((searchText==user_id)||(searchText==zid)||(name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
+                        if ((searchText==user_id)||(user_id.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)||(name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
                             var foundText = "<small><strong>"+name+"</strong>: "+ lab + user + "</small><br />";
                             $( '#searchResults' ).append(foundText);
                             $('#' + lab + user).find('div').find('div').toggle("highlight");
@@ -154,8 +154,7 @@ $(function() {
     $("#users-list").html(getUserList($('#server-select').val()));
 
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
-
-    
+    $.bootstrapSortable(true);
 });
 $("#content").resize(function(e){
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
@@ -217,7 +216,7 @@ var getUserList = function(selected) {
                 for (var user in lab_data[lab].users) {
                     if (lab_data[lab].users[user].user_id) {
                         userlist = userlist + '<tr><td>' + lab_data[lab].users[user].user_id + '</td><td>' +
-                        lab_data[lab].users[user].name + '</td><td>' + lab_data[lab].users[user].since_string + '</td></tr>';
+                        lab_data[lab].users[user].name + '</td><td data-dateformat="H:m:s DD/MM">' + lab_data[lab].users[user].since_string + '</td></tr>';
                     }
                 }
             }
@@ -226,7 +225,19 @@ var getUserList = function(selected) {
     if (userlist=="") {
         userlist = "<span style='font-size:11px'>No users in this lab.</span>";
     } else {
-        userlist = "<table style='font-size:11px' class='table table-striped'><tr><th>CSE ID</th><th>Name</th><th>Logged on Since</th></tr>" + userlist + "</table>";
+        userlist = "<table style='font-size:11px' class='table table-striped table-bordered sortable'> \
+                        <thead> \
+                            <tr> \
+                                <th>CSE ID</th> \
+                                <th data-defaultsort='desc'>Name</th> \
+                                <th>Logged on Since</th> \
+                            </tr> \
+                        </thead> \
+                        <tbody>"+
+                        userlist +
+                        "</tbody> \
+                    </table>";
+        
     }
     return userlist;
 };
@@ -234,4 +245,7 @@ var getUserList = function(selected) {
 $("select").selectpicker({style: 'btn-lg btn-primary', menuStyle: 'dropdown-inverse'});
 $( "#server-select" ).change(function() {
     $("#users-list").html(getUserList($(this).val()));
+    $.bootstrapSortable(true);
 });
+
+
