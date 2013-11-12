@@ -73,21 +73,25 @@ var getPlacementFunction = function (defaultPosition, width, height) {
 
         switch (defaultPosition) {
             case "top":
-                if (position = testTop()) return position;
+                if (position == testTop()) return position;
+                break;
             case "bottom":
-                if (position = testBottom()) return position;
+                if (position == testBottom()) return position;
+                break;
             case "left":
-                if (position = testLeft()) return position;
+                if (position == testLeft()) return position;
+                break;
             case "right":
-                if (position = testRight()) return position;
+                if (position == testRight()) return position;
+                break;
             default:
-                if (position = testTop()) return position;
-                if (position = testBottom()) return position;
-                if (position = testLeft()) return position;
-                if (position = testRight()) return position;
+                if (position == testTop()) return position;
+                if (position == testBottom()) return position;
+                if (position == testLeft()) return position;
+                if (position == testRight()) return position;
                 return defaultPosition;
         }
-    }
+    };
 };
 
 
@@ -147,10 +151,11 @@ $(function() {
         $('html,body').scrollTop(scrollmem);
     });
 
+    $("#users-list").html(getUserList($('#server-select').val()));
+
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
 
-    var userlist = $('#server-select').find(":selected").data("users").split("\n").join("<br />");
-    $("#users-list").html("<pre style='font-size:10px'>" + userlist + "</pre>");
+    
 });
 $("#content").resize(function(e){
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
@@ -192,8 +197,41 @@ for (var lab in lab_data) {
     }
 }
 
+
+var getUserList = function(selected) {
+    var userlist = "";
+    var picked = 0;
+    for (var server in server_data) {
+        if (server == selected) {
+            picked = 1;
+            for (var user in server_data[server].users) {
+                userlist = userlist + '<tr><td>' + server_data[server].users[user].user_id + '</td><td>' +
+                server_data[server].users[user].name + '</td><td>' + server_data[server].users[user].since_string + '</td></tr>';
+                
+            }
+        }
+    }
+    if (picked==0) {
+        for (var lab in lab_data) {
+            if (lab == selected) {
+                for (var user in lab_data[lab].users) {
+                    if (lab_data[lab].users[user].user_id) {
+                        userlist = userlist + '<tr><td>' + lab_data[lab].users[user].user_id + '</td><td>' +
+                        lab_data[lab].users[user].name + '</td><td>' + lab_data[lab].users[user].since_string + '</td></tr>';
+                    }
+                }
+            }
+        }
+    }
+    if (userlist=="") {
+        userlist = "<span style='font-size:11px'>No users in this lab.</span>";
+    } else {
+        userlist = "<table style='font-size:11px' class='table table-striped'><tr><th>CSE ID</th><th>Name</th><th>Logged on Since</th></tr>" + userlist + "</table>";
+    }
+    return userlist;
+};
+
 $("select").selectpicker({style: 'btn-lg btn-primary', menuStyle: 'dropdown-inverse'});
 $( "#server-select" ).change(function() {
-    var userlist = $('#server-select').find(":selected").data("users").split("\n").join("<br />");
-    $("#users-list").html("<pre style='font-size:9px'>" + userlist + "</pre>");
+    $("#users-list").html(getUserList($(this).val()));
 });

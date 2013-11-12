@@ -195,7 +195,7 @@ def get_state(line):
     return state
 
 
-def get_since(line):
+def get_lab_since(line):
     since_reg = re.search(r'(?<=since ).*', line)
     if since_reg:
         since = since_reg.group().strip()
@@ -206,8 +206,17 @@ def get_since(line):
 
     return since_out
 
+def get_server_since(line):
+    since_reg = re.search(r'\s+[0-9 -:]{16} ', line)
+    if since_reg:
+        since = since_reg.group().strip()
+        since_out = time.strptime(since, '%Y-%m-%d %H:%M')
+    else:
+        since_out = time.strptime(time.strftime('%d/%m;0:0:0 %Y'), '%d/%m;%H:%M:%S %Y')
 
-def get_username(line):
+    return since_out
+
+def get_lab_username(line):
     user_reg = re.search(r'(?<=[\bAllocated\b\bTentative\b]: )[\S]+', line)
     user_name = user_reg.group().strip() if user_reg else ''
 
@@ -220,9 +229,9 @@ def get_computer(line):
     if comp_reg:
         data['comp_name'] = comp_reg.group().strip()[:-2]
         data['comp_num'] = int(data['comp_name'][-2:])
-        data['user_name'] = get_username(line)
-        data['since'] = get_since(line)
-        data['user'] = new_user(data['user_name'], data['since'])
+        data['user_id'] = get_lab_username(line)
+        data['since'] = get_lab_since(line)
+        data['user'] = new_user(data['user_id'], data['since'])
 
     return data
 
@@ -234,11 +243,31 @@ def is_valid_lab(lab_list):
 
     return False
 
+def get_server(line):
+    data = {}
+    id_reg = re.search(r'^[A-Za-z0-9]+', line)
+    if id_reg:
+        data['user_id'] = id_reg.group().strip()
+        data['since'] = get_server_since(line)
+        data['user'] = new_user(data['user_id'], data['since'])
+    return data
+
 def get_servers(servers):
     server_output = {}
     for server in servers:
         with open('cache/server/' + server) as server_data:
-            server_output.update({server: server_data.read()})
+            server_list = server_data.read()
+
+        users = {}
+        server_output.update({server: server_list})
+        counter = 0
+        for line in server_list.splitlines():
+            data = get_server(line)
+            if 'user' in data:
+                users[data['user_id']] = data['user']
+            counter += 1
+
+        server_output.update({server: new_lab(server, None, None, users, True, None, None,  True)})
 
     return server_output
 

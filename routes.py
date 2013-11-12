@@ -38,8 +38,9 @@ def home():
     lab_data = webfriends.get_labs(labs)
     return render_template('index.html',
         labs = lab_data,
-        json = jsonpickle.encode(lab_data),
+        lab_json = jsonpickle.encode(lab_data).replace("'",""),
         servers = server_data,
+        server_json = jsonpickle.encode(server_data).replace("'",""),
         debug = debug)
 
 @app.errorhandler(500)

@@ -86,10 +86,14 @@
                     <div class="modal-body">
                         <select id="server-select">
                             {% for server in servers %}
-                            <option value="{{ server }}" data-users="{{ servers[server] }}">{{ server }}</option>
+                            <option value="{{ server }}">{{ server }}</option>
+                            {% endfor %}
+                            {% for lab in labs %}
+                            <option value="{{ lab }}">{{ lab }}</option>
                             {% endfor %}
                         </select>
-                        <div class="well" id="users-list" style="max-height:400px;overflow:auto">
+                        
+                        <div id="users-list" style="max-height:400px;overflow:auto">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -112,7 +116,11 @@
         <script src="{{ url_for('static', filename='js/jquery.tagsinput.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.placeholder.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.ba-resize.min.js') }}"></script>
-        <script type="text/javascript">lab_data = eval('({{json | safe}})');</script>
+        <script type="text/javascript">
+            lab_data = eval('({{ lab_json | safe }})');
+            server_data = eval('({{ server_json | safe }})');
+        
+        </script>
         <script src="{{ url_for('static', filename='js/webfriends.js') }}"></script>
     </body>
 </html>
