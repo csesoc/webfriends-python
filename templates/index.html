@@ -1,6 +1,11 @@
 {% macro map(lab,label) -%}
 	{% if label %}
-	<h4 class="label-{{ 'open' if labs[lab].state else 'closed' }}">{{ labs[lab].name }} [{{ labs[lab].temperature }}]</h4>
+	{% if labs[lab].temperature %}
+		{% set since = '[' ~ labs[lab].temperature ~ ']' %}
+	{% else %}
+		{% set since = '' %}
+	{% endif %}
+	<h4 class="label-{{ 'open' if labs[lab].state else 'closed' }}">{{ labs[lab].name }} {{ since }}</h4>
 	{% else %}
 		{% set insert_label=True %}
 	{% endif %}
