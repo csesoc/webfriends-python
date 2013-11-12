@@ -13,6 +13,7 @@ Track your friends in UNSW cse labs over the web.
  - jinja2
  - markupsafe
  - werkzeug
+ - jsonpickle
 3. Open webfriends.py.cgi/ with a web browser. Make sure that you include the trailing slash, or you will get a 500 error.
 
 ###Temperature and SSH Data

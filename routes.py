@@ -16,7 +16,7 @@
    limitations under the License.
 '''
 
-import webfriends, json
+import webfriends, json, jsonpickle
 from flask import Flask, render_template, request
 
 
@@ -38,6 +38,7 @@ def home():
     lab_data = webfriends.get_labs(labs)
     return render_template('index.html',
         labs = lab_data,
+        json = jsonpickle.encode(lab_data),
         servers = server_data,
         debug = debug)
 

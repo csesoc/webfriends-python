@@ -102,22 +102,31 @@ $("#labTabs a").click(function (e) {
 // Deals with searching
 
 $( "#searchButton" ).click(function() {
-    var searchText = $('#searchText').val()
+    var searchText = $('#searchText').val();
     $( '#searchResults' ).html("");
-    if (searchText!="") {
-        $(".comp").each(function() {
-            if ($(this).data("user-id")) {
-                if ((searchText==$(this).data("user-id"))||(searchText==$(this).data("user-zid"))||($(this).data("user-name").toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
-                    var foundText = "<small><strong>"+$(this).data("user-name")+"</strong>: "+$(this).attr('id')+ "</small><br />";
-                    $( '#searchResults' ).append($(foundText));
-                        $(this).find('div').find('div').toggle("highlight");
-                        $(this).find('div').find('div').toggle("highlight");
+    if (searchText !== "") {
+        for (var lab in lab_data) {
+            if (lab_data[lab].online) {
+                for (var user in lab_data[lab].users) {
+                    if (lab_data[lab].users[user].user_id) {
+                        var user_id = lab_data[lab].users[user].user_id;
+                        var zid = lab_data[lab].users[user].zid;
+                        var name = lab_data[lab].users[user].name;
+                        if ((searchText==user_id)||(searchText==zid)||(name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)) {
+                            var foundText = "<small><strong>"+name+"</strong>: "+ lab + user + "</small><br />";
+                            $( '#searchResults' ).append(foundText);
+                            $('#' + lab + user).find('div').find('div').toggle("highlight");
+                            $('#' + lab + user).find('div').find('div').toggle("highlight");
+
+                            console.log(lab_data[lab].users[user].name);
+                        }
+                        $("#searchResults").css({'display':'inherit'});
+                    }
                 }
-                $("#searchResults").css({'display':'inherit'});
             }
-        });
-        if ($("#searchResults").text()=="") {
-            $("#searchResults").html("<small>No results found.</small>")
+        }
+        if ($("#searchResults").text()==="") {
+            $("#searchResults").html("<small>No results found.</small>");
         }
     } else {
         $("#searchResults").css({'display':'none'});
@@ -155,47 +164,36 @@ $('#searchText').keyup(function(e){
 });
 
 // Puts a popup over all the boxes (that require popups)
+for (var lab in lab_data) {
+    if (lab_data[lab].online) {
+        for (var user in lab_data[lab].users) {
+            if (lab_data[lab].users[user].user_id) {
+                var user_id = lab_data[lab].users[user].user_id;
+                var zid = lab_data[lab].users[user].zid;
+                var name = lab_data[lab].users[user].name;
+                var degree = lab_data[lab].users[user].degree;
+                var since = lab_data[lab].users[user].since_string;
 
-$( ".comp" ).each(function() {
-    if ($(this).data("user-id")) {
-        var content = " ID: "+$(this).data("user-id")+"<br />";
-        if ($(this).data("user-zid")) {
-            content = content + "zID: "+$(this).data("user-zid")+"<br />";
-        }
-        if ($(this).data("user-since")) {
-            content = content + "Since: "+$(this).data("user-since")+"<br />";
-        }
-        if ($(this).data("user-degree")) {
-            content = content + "Degree: "+$(this).data("user-degree");
-        }
-    
-        title =  $(this).data("user-name");
+                var title =  name;
 
-        $(this).popover({   container:'.tab-content',
-                            placement:  getPlacementFunction("top", 300, 300),
-                            content:content,
-                            title:title,
-                            html:true,
-                            trigger:'hover'});
+                var content = "ID: "+ user_id + "<br />";
+                content = content + (zid ? "zID: " + zid + "<br />" : "" );
+                content = content + (degree ? "Degree: " + degree + "<br />" : "" );
+                content = content + (since ? "Since: " + since + "<br />" : "" );
+
+                $("#" + lab + user ).popover({  container:'.tab-content',
+                                                placement:  getPlacementFunction("top", 300, 300),
+                                                content:content,
+                                                title:title,
+                                                html:true,
+                                                trigger:'hover'});
+            }
+        }
     }
-
-//    content = "You can search for people based on their name, cse username and even zid.";
-
-// $('#searchGroup').popover({   container:'body',
-//                             placement: 'top',
-//                             content:content,
-//                             delay:5000,
-//                             title:"Search Tips",
-//                             html:true,
-//                             trigger:'hover'});
-
-});
-
+}
 
 $("select").selectpicker({style: 'btn-lg btn-primary', menuStyle: 'dropdown-inverse'});
 $( "#server-select" ).change(function() {
     var userlist = $('#server-select').find(":selected").data("users").split("\n").join("<br />");
     $("#users-list").html("<pre style='font-size:9px'>" + userlist + "</pre>");
 });
-
-

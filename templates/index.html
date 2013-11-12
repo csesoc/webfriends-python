@@ -88,14 +88,14 @@
 					<h4>Debugging:</h4>
 					{% for lab in labs %}
 						<b>{{ labs[lab].name }}:</b><br />
-						{% for user in labs[lab].users %}
+						<!-- {% for user in labs[lab].users %}
 							{% if labs[lab].users[user].user_id %}					
 								{{ labs[lab].name }}{{ user }} {{labs[lab].users[user].user_id}}<br />
 							{% endif %}
-						{% endfor %}
+						{% endfor %} -->
 						temp: {{labs[lab].temperature}}<br />
 					{% endfor %}
-					
+					{{ json }}
 				</div>
 			</div>
 		</div>
@@ -159,28 +159,6 @@
 		
 	</div>
 
-	<!-- Modal -->
-<div class="modal fade" id="userlistModal" tabindex="-1" role="dialog" aria-labelledby="userlistModalLabel" aria-hidden="true">
- 	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        		<h4 class="modal-title" id="userlistModalLabel">User List</h4>
-      		</div>
-      		<div class="modal-body">
-        		<select id="server-select">
-        			{% for server in servers %}
-                    <option value="{{ server }}" data-users="{{ servers[server] }}">{{ server }}</option>
-                    {% endfor %}
-				</select>
-				<div class="well" id="users-list" style="max-height:400px;overflow:auto">
-				</div>
-      		</div>
-      		<div class="modal-footer">
-        		<button type="button" class="btn" data-dismiss="modal">Close</button>
-      		</div>
-    	</div><!-- /.modal-content -->
-  	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+	
 
 {% endblock %}

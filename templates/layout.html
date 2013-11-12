@@ -71,10 +71,33 @@
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
-            </div><!-- /.modal-content -->
-          </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
+            </div>
+          </div>
+        </div>
 
+
+        <div class="modal fade" id="userlistModal" tabindex="-1" role="dialog" aria-labelledby="userlistModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="userlistModalLabel">User List</h4>
+                    </div>
+                    <div class="modal-body">
+                        <select id="server-select">
+                            {% for server in servers %}
+                            <option value="{{ server }}" data-users="{{ servers[server] }}">{{ server }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="well" id="users-list" style="max-height:400px;overflow:auto">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         <!-- Load JS here for greater good =============================-->
@@ -89,6 +112,7 @@
         <script src="{{ url_for('static', filename='js/jquery.tagsinput.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.placeholder.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.ba-resize.min.js') }}"></script>
+        <script type="text/javascript">lab_data = eval('({{json | safe}})');</script>
         <script src="{{ url_for('static', filename='js/webfriends.js') }}"></script>
     </body>
 </html>

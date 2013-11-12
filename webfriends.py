@@ -46,6 +46,9 @@ class Lab(object):
         self.online = online
         self.temperature = self._get_temperature(name)
 
+    def __str__(self):
+        return self.name
+
     def _get_temperature(self,name):
         path = 'cache/temp/' + name
         if os.path.isfile(path):
