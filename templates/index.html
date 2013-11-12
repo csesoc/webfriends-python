@@ -1,6 +1,6 @@
 {% macro map(lab,label) -%}
 	{% if label %}
-	<h4 class="label-{{ 'open' if labs[lab].state else 'closed' }}">{{ labs[lab].name }}</h4>
+	<h4 class="label-{{ 'open' if labs[lab].state else 'closed' }}">{{ labs[lab].name }} [{{ labs[lab].temperature }}]</h4>
 	{% else %}
 		{% set insert_label=True %}
 	{% endif %}
@@ -88,6 +88,7 @@
 								{{ labs[lab].name }}{{ user }} {{labs[lab].users[user].user_id}}<br />
 							{% endif %}
 						{% endfor %}
+						temp: {{labs[lab].temperature}}<br />
 					{% endfor %}
 					{{ debug1 }}
 				</div>

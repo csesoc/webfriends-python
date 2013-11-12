@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+
 '''
    Copyright 2013 John Wiseheart
 
@@ -30,6 +32,7 @@ class Lab(object):
     size = tuple()
     doors = {}
     online = True
+    temperature = 0.0
 
     def __init__(self, name, computers, directions, users, state, size, doors, online):
 
@@ -41,6 +44,13 @@ class Lab(object):
         self.size = size
         self.doors = doors
         self.online = online
+        self.temperature = self._get_temperature(name)
+
+    def _get_temperature(self,name):
+        with open('cache/temp/' + name) as temp_data:
+            temp_reg = re.search(r' [0-9.]+', temp_data.read())
+            temp = float(temp_reg.group().strip()) if temp_reg else 0.0
+        return round(temp, 1)
 
 
 class User(object):
@@ -55,13 +65,13 @@ class User(object):
     def __init__(self, user_id, since):
 
         self.user_id = user_id
-        self.name = self.getData(user_id)['user_name']
-        self.zid = self.getData(user_id)['user_zid']
-        self.degree = self.getData(user_id)['degree']
+        self.name = self._getData(user_id)['user_name']
+        self.zid = self._getData(user_id)['user_zid']
+        self.degree = self._getData(user_id)['degree']
         self.since = since
         self.since_string = time.strftime('%H:%M:%S %d/%m', since)
 
-    def getData(self, user_id):
+    def _getData(self, user_id):
 
         user = {}
         if user_id != '':
@@ -76,7 +86,7 @@ class User(object):
             degree_reg = re.search(r' [\d]{4}_Student', data)
             if degree_reg:
                 degree_num = int(degree_reg.group().strip()[:-8])
-                user['degree'] = self.get_degree(degree_num)
+                user['degree'] = self._get_degree(degree_num)
             else:
                 user['degree'] = ''
         else:
@@ -85,7 +95,7 @@ class User(object):
             user['degree'] = ''
         return user
 
-    def get_degree(self, degree_num):
+    def _get_degree(self, degree_num):
 
         degrees = {
             3529: 'Comm/CompSci',
@@ -214,7 +224,7 @@ def get_computer(line):
 
 def is_valid_lab(lab_list):
     if len(lab_list.splitlines()) > 2:
-        if lab_list.splitlines()[1][0:3] == 'Lab':
+        if lab_list.splitlines()[1].startswith('Lab'):
             return True
 
     return False

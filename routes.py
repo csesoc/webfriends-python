@@ -24,30 +24,29 @@ app = Flask(__name__)
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 if __name__ == '__main__':
-	app.run(debug=False)
+    app.run(debug=False)
 
 @app.route('/')
 def home():
-	debug = request.args.get('debug')
+    debug = request.args.get('debug')
 
-	json_data = open('webfriends.json')
-	labs = json.load(json_data)
-	json_data.close()
+    with open('webfriends.json') as json_data:
+        labs = json.load(json_data)
 
-	lab_data = webfriends.get_labs(labs)
-	return render_template('index.html',
-		labs = lab_data,
-		debug = debug)
+    lab_data = webfriends.get_labs(labs)
+    return render_template('index.html',
+        labs = lab_data,
+        debug = debug)
 
 @app.errorhandler(500)
 def page_not_found(e):
     return render_template('500.html',
-    	env = e)
+        env = e)
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html',
-    	env = e),404
+        env = e),404
 
 if not app.debug:
     import logging
