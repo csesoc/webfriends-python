@@ -50,21 +50,50 @@
 {%- endmacro %}
 {% extends "layout.html" %}
 {% block content %}
+	<noscript>
+		<div class="alert alert-danger fade in">
+        <h4>Whoa! You don't have javascript!</h4>
+        <p>Webfriends uses a lot of javascript to make it run and so by turning it off, you're only disadvantaging yourself.</p>
+        <p>
+          <a href="http://enable-javascript.com/" class="btn btn-danger">Turn on Javascript</a>
+        </p>
+      </div>
+	</noscript>
 	{% if debug %}
 		<div class="row">
 			<div class="col-md-12">
 				<div class="well">
 					<h4>Debugging:</h4>
-					{% for lab in labs %}
-						<b>{{ labs[lab].name }}:</b><br />
-						<!-- {% for user in labs[lab].users %}
-							{% if labs[lab].users[user].user_id %}					
-								{{ labs[lab].name }}{{ user }} {{labs[lab].users[user].user_id}}<br />
-							{% endif %}
-						{% endfor %} -->
-						temp: {{labs[lab].temperature}}<br />
-					{% endfor %}
-					{{ server_json }}
+					<div class="panel-group" id="accordion">
+						<div class="panel panel-default">
+					  		<div class="panel-heading">
+					      		<h4 class="panel-title">
+					        		<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+					          			Lab Data
+					        		</a>
+					      		</h4>
+					    	</div>
+					    	<div id="collapseOne" class="panel-collapse collapse">
+					     		<div class="panel-body">
+					      			<pre id="lab_data"></pre>
+					    		</div>
+					 		</div>
+						</div>
+					 	<div class="panel panel-default">
+					    	<div class="panel-heading">
+					      		<h4 class="panel-title">
+					        		<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+					          			Server Data
+					        		</a>
+					      		</h4>
+					    	</div>
+					    	<div id="collapseTwo" class="panel-collapse collapse">
+					      		<div class="panel-body">
+					      			<pre id="server_data"></pre>
+					      		</div>
+					    	</div>
+					  	</div>
+					</div>
 				</div>
 			</div>
 		</div>

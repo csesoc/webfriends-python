@@ -94,6 +94,30 @@ var getPlacementFunction = function (defaultPosition, width, height) {
     };
 };
 
+// pretty json
+
+function syntaxHighlight(json) {
+    if (typeof json != 'string') {
+         json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}
+
 
 // make tabs work
 
@@ -137,32 +161,40 @@ $( "#searchButton" ).click(function() {
     }
 });
 
-// Deals with resizing the search box so it doesnt look strange
-// Also deals with persisten tabs (kinda)
 $(function() {
-
+    // Deals with persisten tabs (kinda)
     var hash = window.location.hash;
     hash && $('ul.nav a[href="' + hash + '"]').tab('show');
     window.scrollTo(0, 0);
     $('#labTabs a').click(function (e) {
         $(this).tab('show');
-        var scrollmem = $('body').scrollTop();
+        window.scrollTo(0, 0);
         window.location.hash = this.hash;
-        $('html,body').scrollTop(scrollmem);
+        window.scrollTo(0, 0);
     });
 
+    // Server list
     $("#users-list").html(getUserList($('#server-select').val()));
+    $.bootstrapSortable();
 
+    // Deals with resizing the search box so it doesnt look strange
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
-    $.bootstrapSortable(true);
+    
+    // Debug pretty JSON
+    jQuery.fn.exists = function(){return this.length>0;};
+    if ($('#lab_data').exists()) {
+        $('#lab_data').html(syntaxHighlight(JSON.stringify(lab_data, undefined, '\t')));
+        $('#server_data').html(syntaxHighlight(JSON.stringify(server_data, undefined, '\t')));
+    }
 });
+
+// Deals with resizing the search box so it doesnt look strange
 $("#content").resize(function(e){
     $("#searchResults").css({'max-height':(($("#content").height()-50)+'px')});
 });
 
 
-// Deals with enter press in search box
-
+// Searches on keypress
 $('#searchText').keyup(function(e){
         $('#searchButton').click();
 });
@@ -174,11 +206,11 @@ for (var lab in lab_data) {
             if (lab_data[lab].users[user].user_id) {
                 var user_id = lab_data[lab].users[user].user_id;
                 var zid = lab_data[lab].users[user].zid;
-                var name = lab_data[lab].users[user].name;
+                var uname = lab_data[lab].users[user].name;
                 var degree = lab_data[lab].users[user].degree;
                 var since = lab_data[lab].users[user].since_string;
 
-                var title =  name;
+                var title =  uname;
 
                 var content = "ID: "+ user_id + "<br />";
                 content = content + (zid ? "zID: " + zid + "<br />" : "" );
@@ -196,53 +228,59 @@ for (var lab in lab_data) {
     }
 }
 
-
+// generate the list of users for each lab/sever
 var getUserList = function(selected) {
     var userlist = "";
     var picked = 0;
-    for (var server in server_data) {
-        if (server == selected) {
-            picked = 1;
-            for (var user in server_data[server].users) {
-                userlist = userlist + '<tr><td>' + server_data[server].users[user].user_id + '</td><td>' +
-                server_data[server].users[user].name + '</td><td>' + server_data[server].users[user].since_string + '</td></tr>';
-                
+    var user = "";
+    if (selected in server_data) {
+        for (user in server_data[selected].users) {
+            userlist = userlist + '<tr><td>' + server_data[selected].users[user].user_id + '</td><td>' +
+            server_data[selected].users[user].name + '</td><td data-dateformat="H:m:s DD/MM">' + server_data[selected].users[user].since_string + '</td></tr>';
+            
+        }
+    } else if (selected in lab_data) {
+        for (user in lab_data[selected].users) {
+            if (lab_data[selected].users[user].user_id) {
+                userlist = userlist + '<tr><td>' + lab_data[selected].users[user].user_id + '</td><td>' +
+                lab_data[selected].users[user].name + '</td><td data-dateformat="H:m:s DD/MM">' + lab_data[selected].users[user].since_string + '</td></tr>';
             }
         }
-    }
-    if (picked==0) {
+    } else if (selected == "all-labs") {
         for (var lab in lab_data) {
-            if (lab == selected) {
-                for (var user in lab_data[lab].users) {
-                    if (lab_data[lab].users[user].user_id) {
-                        userlist = userlist + '<tr><td>' + lab_data[lab].users[user].user_id + '</td><td>' +
-                        lab_data[lab].users[user].name + '</td><td data-dateformat="H:m:s DD/MM">' + lab_data[lab].users[user].since_string + '</td></tr>';
-                    }
+            for (user in lab_data[lab].users) {
+                if (lab_data[lab].users[user].user_id) {
+                    userlist = userlist + '<tr><td>' + lab_data[lab].users[user].user_id + '</td><td>' +
+                    lab_data[lab].users[user].name + '</td><td data-dateformat="H:m:s DD/MM">' + lab_data[lab].users[user].since_string + '</td></tr>';
                 }
             }
         }
     }
-    if (userlist=="") {
+
+
+    if (userlist==="") {
         userlist = "<span style='font-size:11px'>No users in this lab.</span>";
     } else {
-        userlist = "<table style='font-size:11px' class='table table-striped table-bordered sortable'> \
-                        <thead> \
-                            <tr> \
-                                <th>CSE ID</th> \
-                                <th data-defaultsort='desc'>Name</th> \
-                                <th>Logged on Since</th> \
-                            </tr> \
-                        </thead> \
-                        <tbody>"+
-                        userlist +
-                        "</tbody> \
-                    </table>";
-        
+        userlist = ["<table style='font-size:11px' class='table table-striped table-bordered sortable'>",
+                        "<thead>",
+                            "<tr>",
+                                "<th>CSE ID</th>",
+                                "<th>Name</th>",
+                                "<th data-defaultsort='desc'>Logged on Since</th>",
+                            "</tr>",
+                        "</thead>",
+                        "<tbody>",
+                        userlist ,
+                        "</tbody>",
+                    "</table>"].join('\n');
     }
     return userlist;
 };
 
+//make the select input pretty
 $("select").selectpicker({style: 'btn-lg btn-primary', menuStyle: 'dropdown-inverse'});
+
+//change the user table when a different lab is selected
 $( "#server-select" ).change(function() {
     $("#users-list").html(getUserList($(this).val()));
     $.bootstrapSortable(true);

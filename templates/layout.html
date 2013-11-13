@@ -91,11 +91,12 @@
                     </div>
                     <div class="modal-body">
                         <select id="server-select">
-                            {% for server in servers %}
-                            <option value="{{ server }}">{{ server }}</option>
-                            {% endfor %}
+                            <option value="all-labs">all labs</option>
                             {% for lab in labs %}
                             <option value="{{ lab }}">{{ lab }}</option>
+                            {% endfor %}
+                            {% for server in servers %}
+                            <option value="{{ server }}">{{ server }}</option>
                             {% endfor %}
                         </select>
 
@@ -127,7 +128,8 @@
         <script type="text/javascript">
             lab_data = eval('({{ lab_json | safe }})');
             server_data = eval('({{ server_json | safe }})');
-        
+            lab_json = '{{ lab_json | safe }}';
+            server_json = '{{ server_json | safe }}';
         </script>
         <script src="{{ url_for('static', filename='js/webfriends.js') }}"></script>
     </body>
