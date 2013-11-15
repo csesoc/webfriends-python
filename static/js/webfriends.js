@@ -218,7 +218,7 @@ for (var lab in lab_data) {
                 content = content + (since ? "Since: " + since + "<br />" : "" );
 
                 $("#" + lab + user ).popover({  container:'.tab-content',
-                                                placement:  getPlacementFunction("top", 300, 300),
+                                                placement: 'auto top',
                                                 content:content,
                                                 title:title,
                                                 html:true,

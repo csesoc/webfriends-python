@@ -1,7 +1,7 @@
 {% macro map(lab,label) -%}
 	{% if label %}
 	{% if labs[lab].temperature %}
-		{% set since = '[' ~ labs[lab].temperature ~ ']' %}
+		{% set since = '[' ~ labs[lab].temperature ~ "&#186;]" | safe %}
 	{% else %}
 		{% set since = '' %}
 	{% endif %}
@@ -27,8 +27,11 @@
 				{% set xref, yref = labs[lab].computers[user] %}
 
 				<div class="comp comp-{{ 'open' if labs[lab].state else 'closed' }} grid-{{ xref }}-{{ yref }}" id="{{ labs[lab].name }}{{user}}">
+				
 				{% if labs[lab].users[user].user_id %}
 					{% set termstate = 'unavailable' %}
+				{% elif labs[lab].users[user].allocated %}
+					{% set termstate = 'allocated' %}
 				{% elif labs[lab].state %}
 					{% set termstate = 'available' %}
 				{% else %}
@@ -36,7 +39,7 @@
 				{% endif %}
 					<div class="screenwrap screen-{{ labs[lab].directions[user] }}">
 						<div class="cssscreen terminal-{{ termstate }}"></div>
-					
+						
 						{% if labs[lab].users[user].user_id %}
 						<div class="cssperson terminal-{{ 'unavailable' if labs[lab].users[user].user_id else 'available' }}"></div>
 						{% endif %}

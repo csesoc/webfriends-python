@@ -43,6 +43,16 @@ def home():
         server_json = jsonpickle.encode(server_data).replace("'",""),
         debug = debug)
 
+@app.route('/json')
+def json_view():
+    
+    with open('webfriends.json') as json_data:
+        labs = json.load(json_data)
+    
+    lab_data = webfriends.get_labs(labs)
+    return jsonpickle.encode(lab_data).replace("'","")
+    
+
 @app.errorhandler(500)
 def page_not_found(e):
     return render_template('500.html',

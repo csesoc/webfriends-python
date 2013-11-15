@@ -41,6 +41,7 @@
 
 .terminal-available 	{ 	background-color:#1abc9c;	}
 .terminal-unavailable	{ 	background-color:#e74c3c;	}
+.terminal-allocated     {   background-color:#a66bbe;   }
 
 .label-open     { color: #27ae60; }
 .label-closed   { color: #c0392b; }

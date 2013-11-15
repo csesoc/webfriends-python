@@ -66,13 +66,15 @@ class User(object):
     degree = ''
     since = time.struct_time
     since_string = ''
+    allocated = False
 
-    def __init__(self, user_id, since):
+    def __init__(self, user_id, since, allocated):
 
         self.user_id = user_id
         self.name = self._getData(user_id)['user_name']
         self.zid = self._getData(user_id)['user_zid']
         self.degree = self._getData(user_id)['degree']
+        self.allocated = allocated
         self.since = since
         self.since_string = time.strftime('%H:%M:%S %d/%m', since)
 
@@ -138,9 +140,9 @@ class User(object):
         return degree_name
 
 
-def new_user(user_id, since):
+def new_user(user_id, since, allocated):
 
-    user = User(user_id, since)
+    user = User(user_id, since, allocated)
     return user
 
 
@@ -222,6 +224,13 @@ def get_lab_username(line):
 
     return user_name
 
+def get_allocated(line):
+    allocated_reg = re.search(r' Allocated', line)
+    if allocated_reg:
+        allocated = True
+    else:
+        allocated = False
+    return allocated
 
 def get_computer(line):
     data = {}
@@ -231,7 +240,8 @@ def get_computer(line):
         data['comp_num'] = int(data['comp_name'][-2:])
         data['user_id'] = get_lab_username(line)
         data['since'] = get_lab_since(line)
-        data['user'] = new_user(data['user_id'], data['since'])
+        data['allocated'] = get_allocated(line)
+        data['user'] = new_user(data['user_id'], data['since'], data['allocated'])
 
     return data
 
@@ -249,7 +259,7 @@ def get_server(line):
     if id_reg:
         data['user_id'] = id_reg.group().strip()
         data['since'] = get_server_since(line)
-        data['user'] = new_user(data['user_id'], data['since'])
+        data['user'] = new_user(data['user_id'], data['since'], False)
     return data
 
 def get_servers(servers):
