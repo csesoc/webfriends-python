@@ -12,3 +12,4 @@ werkzeug/
 webfriends.pyc
 cache/
 jsonpickle/
+private.json

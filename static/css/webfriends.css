@@ -23,6 +23,9 @@
 
 .offline{
     text-align: center;
+    background: #bdc3c7;
+    height: 100%;
+    padding-top: 30px;
 }
 
 .sup {

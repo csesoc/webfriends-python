@@ -20,7 +20,7 @@ import subprocess
 import re
 import time
 import os
-
+import json
 
 class Lab(object):
 
@@ -57,6 +57,7 @@ class Lab(object):
                 temp = float(temp_reg.group().strip()) if temp_reg else 0.0
             return round(temp, 1)
 
+private_list = []
 
 class User(object):
 
@@ -69,11 +70,16 @@ class User(object):
     allocated = False
 
     def __init__(self, user_id, since, allocated):
-
-        self.user_id = user_id
-        self.name = self._getData(user_id)['user_name']
-        self.zid = self._getData(user_id)['user_zid']
-        self.degree = self._getData(user_id)['degree']
+        if not self._isPrivate(user_id):
+            self.user_id = user_id
+            self.name = self._getData(user_id)['user_name']
+            self.zid = self._getData(user_id)['user_zid']
+            self.degree = self._getData(user_id)['degree']
+        else:
+            self.user_id = "PriUser"
+            self.name = "Private User"
+            self.zid = ""
+            self.degree = ""
         self.allocated = allocated
         self.since = since
         self.since_string = time.strftime('%H:%M:%S %d/%m', since)
@@ -85,22 +91,44 @@ class User(object):
             data = import_from_file(user_id, 'users', 60 * 60 * 24 * 30 * 3)
 
             user_name_reg = re.search(r'(?<=[^\bUser\b] Name : ).*', data)
-            user['user_name'] = user_name_reg.group().strip()
+            if user_name_reg:
+                user['user_name'] = user_name_reg.group().strip()
 
-            zid_reg = re.search(r'z[0-9]+', data)
-            user['user_zid'] = zid_reg.group().strip() if zid_reg else ''
+                zid_reg = re.search(r'z[0-9]+', data)
+                user['user_zid'] = zid_reg.group().strip() if zid_reg else ''
 
-            degree_reg = re.search(r' [\d]{4}_Student', data)
-            if degree_reg:
-                degree_num = int(degree_reg.group().strip()[:-8])
-                user['degree'] = self._get_degree(degree_num)
+                degree_reg = re.search(r' [\d]{4}_Student', data)
+                if degree_reg:
+                    degree_num = int(degree_reg.group().strip()[:-8])
+                    user['degree'] = self._get_degree(degree_num)
+                else:
+                    user['degree'] = ''
             else:
-                user['degree'] = ''
+                user['user_zid'] = 'dicks'
+                user['user_name'] = 'dicks'
+                user['degree'] = 'dicks'
         else:
             user['user_zid'] = ''
             user['user_name'] = ''
             user['degree'] = ''
         return user
+
+    def _isPrivate(self, user_id):
+        if user_id in self.get_private_list():
+            return True
+        else:
+            return False
+        return False
+
+    def get_private_list(self):
+        if not private_list:
+            with open('private.json') as json_data:
+                 private = json.load(json_data)
+                 global private_list
+                 private_list = private
+                 return private
+        else:
+            return private_list
 
     def _get_degree(self, degree_num):
 
@@ -150,7 +178,6 @@ def new_lab(name, computers, directions, users, state, size, doors, online):
 
     lab = Lab(name, computers, directions, users, state, size, doors, online)
     return lab
-
 
 def import_from_file(cache_id, cache_type, refresh_time=60):  # cache to file # yolo
 

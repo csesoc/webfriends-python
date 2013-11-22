@@ -30,12 +30,12 @@
 				
 				{% if labs[lab].users[user].user_id %}
 					{% set termstate = 'unavailable' %}
+				{% elif not labs[lab].state %}
+					{% set termstate = 'closed' %}
 				{% elif labs[lab].users[user].allocated %}
 					{% set termstate = 'allocated' %}
 				{% elif labs[lab].state %}
 					{% set termstate = 'available' %}
-				{% else %}
-					{% set termstate = 'closed' %}
 				{% endif %}
 					<div class="screenwrap screen-{{ labs[lab].directions[user] }}">
 						<div class="cssscreen terminal-{{ termstate }}"></div>

@@ -48,7 +48,7 @@ def json_view():
     
     with open('webfriends.json') as json_data:
         labs = json.load(json_data)
-    
+
     lab_data = webfriends.get_labs(labs)
     return jsonpickle.encode(lab_data).replace("'","")
     
