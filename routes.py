@@ -38,9 +38,9 @@ def home():
     lab_data = webfriends.get_labs(labs)
     return render_template('index.html',
         labs = lab_data,
-        lab_json = jsonpickle.encode(lab_data).replace("'",""),
+        lab_json = jsonpickle.encode(lab_data, unpicklable=False).replace("'",""),
         servers = server_data,
-        server_json = jsonpickle.encode(server_data).replace("'",""),
+        server_json = jsonpickle.encode(server_data, unpicklable=False).replace("'",""),
         debug = debug)
 
 @app.route('/json')
@@ -50,7 +50,7 @@ def json_view():
         labs = json.load(json_data)
 
     lab_data = webfriends.get_labs(labs)
-    return jsonpickle.encode(lab_data).replace("'","")
+    return jsonpickle.encode(lab_data, unpicklable=False).replace("'","")
     
 
 @app.errorhandler(500)
