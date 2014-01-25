@@ -53,3 +53,7 @@ Ask for more explanation if this doesnt make sense.
  - See issues
 
 Webfriends is available under the Apache License 2.0.
+
+###Something Broken?
+
+When SS change things it can screw up webfriends. Open `err.log` and check the last traceback. Its probably that they have added or removed a computer in a lab, so you might need to edit `webfriends.json`
