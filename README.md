@@ -6,7 +6,7 @@ Track your friends in UNSW cse labs over the web.
 ##Instructions:
 
 ###Basic Install
-1. Clone webfriends to your public_html (on your cse account) directory using `git clone https://github.com/johnwiseheart/webfriends-python.git`
+1. Clone webfriends to your public_html (on your cse account) directory using `git clone https://github.com/csesoc/webfriends-python.git`
 2. You need to install the dependencies into the webfrieds-python folder:
  - flask
  - itsdangerous
@@ -56,4 +56,4 @@ Webfriends is available under the Apache License 2.0.
 
 ###Something Broken?
 
-When SS change things it can screw up webfriends. Open `err.log` and check the last traceback. Its probably that they have added or removed a computer in a lab, so you might need to edit `webfriends.json`
+When SS change things it can screw up webfriends. Open `err.log` and check the last traceback. Its probably that they have added or removed a computer in a lab, so you might need to edit `webfriends.json`. You can also run `lab <labname>` in a cse terminal to check whether a lab is actually offline, and/or whether webfriends has the incorrect number of computers in its json file.
